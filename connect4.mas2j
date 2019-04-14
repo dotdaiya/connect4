@@ -1,0 +1,21 @@
+/*
+    connect4
+    ---------------------------
+
+    Jason Project File
+
+    This file defines the initial state of the MAS
+
+    Jason 
+    abril 14, 2019 - 12:16:00
+*/
+
+MAS connect4 {
+
+    infrastructure: Centralised
+
+    agents:
+        player;
+
+}
+

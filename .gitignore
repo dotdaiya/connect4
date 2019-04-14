@@ -1,0 +1,13 @@
+# Compiled source
+/bin
+
+# Temporary files
+*.asl~
+*.mas2j~
+
+# Board files
+Blackboard.java
+CustomView.java
+CustomModel.java
+*.png
+*.gif
