@@ -230,80 +230,144 @@ parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
 
 
 /* Parejas que generan un trio: */
+/* Horizontales */
 
-parejaGeneraTrioHorizontalDerecha([pos(X0+2,Y),pos(X0+3,Y)],J):-
+parejaHorizontalIzquierda([pos(X0+2,Y)],J):-
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
 	tablero(X0+3,Y,0) &
-	puedeColocar(X0+3,Y).
+	puedeColocar(X0+2,Y).
 
-parejaGeneraTrioHorizontalIzquierda([pos(X0+1,Y)],J):-
+parejaHorizontalDerecha([pos(X0+1,Y)],J):-
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,J) &
-	tablero(X0+4,Y,0) &
 	puedeColocar(X0+1,Y).
 
-parejaGeneraTrioHorizontalCentral([pos(X0+2,Y)],J):-
+parejaHorizontalCentral([pos(X0,Y)],J):-
+	tablero(X0,Y,0) &
+	tablero(X0+1,Y,J) &
+	tablero(X0+2,Y,J) &
+	tablero(X0+3,Y,0) &
+	puedeColocar(X0,Y).
+
+parejaHorizontalSeparadaIzquierda([pos(X0+1,Y)],J):-
+	tablero(X0,Y,J) &
+	tablero(X0+1,Y,0) &
+	tablero(X0+2,Y,J) &
+	tablero(X0+3,Y,0) &
+	puedeColocar(X+1,Y).
+
+parejaHorizontalSeparadaIzquierda([pos(X0+2,Y)],J):-
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
 	tablero(X0+3,Y,J) &
-	tablero(X0+4,Y,0) &
 	puedeColocar(X0+2,Y).
 
-parejaGeneraTrioDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,0) &
-	tablero(X0+4,Y0+4,0) &
-	puedeColocar(X0+3,Y0+3).
+parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
+	tablero(X0,Y,J) &
+	tablero(X0+1,Y,0) &
+	tablero(X0+2,Y,0) &
+	tablero(X0+3,Y,J) &
+	puedeColocar(X0+1,Y).
 
-parejaGeneraTrioDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):-
+/* Verticales */
+
+parejaVertical([pos(X0,Y)],J):-
+	tablero(X0,Y,0) &
+	tablero(X0,Y+1,J) &
+	tablero(X0,Y+2,J).
+
+/* Diagonales Alpha */ 
+
+parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0+1,J) &
+	tablero(X0+2,Y0+2,0) &
+	tablero(X0+3,Y0+3,0) &
+	puedeColocar(X0+2,Y0+2).
+
+parejaDiagonalAlphaDerecha([pos(X0+1,Y0+1)],J):-
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,J) &
-	tablero(X0+4,Y0+4,0) &
 	puedeColocar(X0+1,Y0+1).
 
-parejaGeneraTrioDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):-
+parejaDiagonalAlphaCentral([pos(X0,Y0)],J):-
+	tablero(X0,Y0,0) &
+	tablero(X0+1,Y0+1,J) &
+	tablero(X0+2,Y0+2,J) &
+	tablero(X0+3,Y0+3,0) &
+	puedeColocar(X0,Y0).
+
+parejaDiagonalAlphaSeparadaIzq([pos(X0+1,Y0+1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0+1,0) &
+	tablero(X0+2,Y0+2,J) &
+	tablero(X0+3,Y0+3,0) &
+	puedeColocar(X0+1,Y0+1).
+
+parejaDiagonalAlphaSeparadaDer([pos(X0+2,Y0+2)],J):-
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
 	tablero(X0+3,Y0+3,J) &
-	tablero(X0+4,Y0+4,0) &
 	puedeColocar(X0+2,Y0+2).
 
-parejaGeneraTrioDiagonalBetaIzquierda([pos(X0+3,Y0+3)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) &
-	tablero(X0-4,Y0+4,0) &
-	puedeColocar(X0-3,Y0+3).
+parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0+1,0) &
+	tablero(X0+2,Y0+2,0) &
+	tablero(X0+3,Y0+3,J) &
+	puedeColocar(X0+1,Y0+1).
 
-parejaGeneraTrioDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):-
+/* Diagonales Beta */
+
+parejaDiagonalBetaIzquierda([pos(X0+2,Y0+2)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0+1,J) &
+	tablero(X0+2,Y0+2,0) &
+	tablero(X0+3,Y0+3,0) &
+	puedeColocar(X0+2,Y0+2).
+
+parejaDiagonalBetaDerecha([pos(X0+1,Y0+1)],J):-
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
 	tablero(X0-3,Y0+3,J) &
-	tablero(X0-4,Y0+4,0) &
 	puedeColocar(X0-1,Y0+1).
 
-parejaGeneraTrioDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
+parejaDiagonalBetaCentral([pos(X0,Y0)],J):-
+	tablero(X0,Y0,0) &
+	tablero(X0-1,Y0+1,J) &
+	tablero(X0-2,Y0+2,J) &
+	tablero(X0-3,Y0+3,0) &
+	puedeColocar(X0,Y0).
+
+parejaGeDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0-1,Y0+1,0) &
+	tablero(X0-2,Y0+2,J) &
+	tablero(X0-3,Y0+3,0) J
+	puedeColocar(X0-1,Y0+1).
+
+parejaGeneraTrioDiagonalSeparadaDer([pos(X0-2,Y0+2)],J):-
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,0) &
 	tablero(X0-3,Y0+3,J) &
-	tablero(X0-4,Y0+4,0) &
 	puedeColocar(X0-2,Y0+2).
 
-
-
+parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0-1,Y0+1,0) &
+	tablero(X0-2,Y0+2,0) &
+	tablero(X0-3,Y0+3,J) &
+	puedeColocar(X0-1,Y0+1).
 
 
 /* Calcula una lista de movimientos con su puntuacion */
