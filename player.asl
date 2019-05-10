@@ -352,7 +352,7 @@ parejaGeDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):-
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) J
+	tablero(X0-3,Y0+3,0) &
 	puedeColocar(X0-1,Y0+1).
 
 parejaGeneraTrioDiagonalSeparadaDer([pos(X0-2,Y0+2)],J):-
@@ -395,14 +395,87 @@ calcularPuntuacion(X,Y,J,mov(X,Y,Puntuacion)):-
 /* Devuelve los puntos de estado del tablero */
 //puntos(X,Y,J):-
 
-/*Define quien es el jugador y quien es el rival de forma numérica en función del nombre*/
+/*
+	Define quien es el jugador y quien es el rival de forma numerica en funcion 
+del nombre, queda comprobado que el tablero solo reconoce a los agentes con el 
+nombre indicado
+*/
 //NOT TESTED
 quienSoy(1,2):-
 	  .my_name(player1).
 quienSoy(2,1):-
 	  .my_name(player2).
 	  
+/*Halla las parejas disponibles en el tablero*/
+//NOT TESTED
+parejas([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T],J):-
+	parejaHorizontalIzquierda(A,J) &
+	parejaHorizontalDerecha(B,J) &
+	parejaHorizontalCentral(C,J) &
+	parejaHorizontalSeparadaIzquierda(D,J) &
+	parejaHorizontalSeparadaIzquierda(E,J) &
+	parejaHorizontalSeparadaCentro(F,J) &
+	parejaVertical(G,J) &
+	parejaDiagonalAlphaIzquierda(H,J) &
+	parejaDiagonalAlphaDerecha(I,J) &
+	parejaDiagonalAlphaCentral(K,J) &
+	parejaDiagonalAlphaSeparadaIzq(L,J) &
+	parejaDiagonalAlphaSeparadaDer(M,J) &
+	parejaDiagonalAlphaSeparadaCentro(N,J) &
+	parejaDiagonalBetaIzquierda(O,J) &
+	parejaDiagonalBetaDerecha(P,J) &
+	parejaDiagonalBetaCentral(Q,J) &
+	parejaGeDiagonalBetaSeparadaIzq(R,J) &
+	parejaGeneraTrioDiagonalSeparadaDer(S,J) &
+	parejaDiagonalBetaSeparadaCentro(T,J). 
 
+	/* Halla las parejas que generan un trio que ganan siempre */
+	//NOT TESTED
+parejasTriosGanadoras([A,B,C,D,E,F,G,H,I],Jugador):-
+	parejaGanadoraHorizontalDerecha(A,J) &
+	parejaGanadoraHorizontalIzquierda(B,J) &
+	parejaGanadoraHorizontalCentral(C,J) &
+	parejaGanadoraDiagonalAlphaDerecha(D,J)&
+	parejaGanadoraDiagonalAlphaIzquierda(E,J) &
+	parejaGanadoraDiagonalAlphaCentral(F,J) &
+	parejaGanadoraDiagonalBetaIzquierda(G,J) &
+	parejaGanadoraDiagonalBetaDerecha(H,J) &
+	parejaGanadoraDiagonalBetaCentral(I,J).
+	
+/*Halla los trios que ganan siempre*/
+//NOT TESTED
+ganarSiempre([A,B,C],J):-
+	ganarSiempreHorizontal(A,J) &
+	ganarSiempreDiagonalAlpha(B,J) &
+	ganarSiempreDiagonalBeta(C,J).
+
+/*Obtener las puntuaciones*/
+
+/*Valora los estados actuales del tablero*/
+//NOT TESTED
+puntuacionTotal(P+Q,Jugador,jugarAganar):-
+	puntuacionParejas(P,Jugador) &
+	puntuacionGanar(Q,Jugador).
+/*Por gestionar jugar a perder y los trios*/
+	
+//NOT TESTED	
+puntuacionParejas(Puntuacion+Puntuacion2,Jugador):-
+	parejas(Lista1,Jugador) &
+	parejasTriosGanadoras(Lista2,Jugador) &
+	.length(Lista1,Puntuacion) &
+	.lengt(Lista2,Puntuacion2).
+	
+//Cada candidato de ganar siempre cuenta como +20
+//NOT TESTED
+puntuacionGanar(Puntuacion*20,Jugador):-
+	ganarSiempre(L,Jugador) &
+	.length(L,Puntuacion).
+
+	  	
+	
+	
+	
+	
 /* Initial goals */
 /* Plans */
 
@@ -434,3 +507,32 @@ quienSoy(2,1):-
 
 +!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
 	.put(X,Y-1).
+	
+
+
+
+
+	
+	
+/* Por gestionar en la valoracion del tablero
+
+Posiciones en las que tienes un tres en raya con solo una libre: +20
+tresEnRayaVertical([pos(X,Y0)],J)
+tresEnRayaHorizontalIzquierda([pos(X0,Y)],J)
+tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J)
+tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J)
+tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J)
+tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J)
+tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J)
+/* Posiciones en las que hay tres en cuatro y una para ganar:  
+tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J)
+tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J)
+tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J)
+tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J)
+tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J)
+tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J)*/
+
+
+	
+
+	
