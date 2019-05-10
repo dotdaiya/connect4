@@ -395,16 +395,13 @@ calcularPuntuacion(X,Y,J,mov(X,Y,Puntuacion)):-
 /* Devuelve los puntos de estado del tablero */
 //puntos(X,Y,J):-
 
-/*Define quien es el jugador y quien es el rival*/
-//Not tested
-quienSoy(Jugador,Rival):-
-	  .my_name(Jugador);
-        if(Jugador == player1){
-            Rival = player2;
-        }
-        else{
-            Rival = player2;
-        }.
+/*Define quien es el jugador y quien es el rival de forma numérica en función del nombre*/
+//NOT TESTED
+quienSoy(1,2):-
+	  .my_name(player1).
+quienSoy(2,1):-
+	  .my_name(player2).
+	  
 
 /* Initial goals */
 /* Plans */
@@ -428,3 +425,12 @@ quienSoy(Jugador,Rival):-
 +!minMax(XActual,Profundidad,LMovimientos):
 	Profundidad = 0 <-
 		?calcularMovimientos(LMovimientos).
+		
+
+/*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
+//NOT TESTED
++!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
+	.put(X,Y-1).
+
++!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
+	.put(X,Y-1).
