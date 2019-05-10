@@ -395,6 +395,16 @@ calcularPuntuacion(X,Y,J,mov(X,Y,Puntuacion)):-
 /* Devuelve los puntos de estado del tablero */
 //puntos(X,Y,J):-
 
+/*Define quien es el jugador y quien es el rival*/
+//Not tested
+quienSoy(Jugador,Rival):-
+	  .my_name(Jugador);
+        if(Jugador == player1){
+            Rival = player2;
+        }
+        else{
+            Rival = player2;
+        }.
 
 /* Initial goals */
 /* Plans */
