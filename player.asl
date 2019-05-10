@@ -1,7 +1,5 @@
 // Agent player in project connect4.mas2j
 
-
-
 /* Initial beliefs and rules */
 
 
@@ -23,16 +21,20 @@ ocupadoFueraDeTablero(X,Y,J):-
 
 
 /* Comprueba si se puede colocar en una posiciÃ³n por encima de la fila siete */
-puedeColocar(X,0).
 
-puedeColocar(X,Y):-
-	(Y > 0) &
-	(tablero(X,Y-1,1) |
-	tablero(X,Y-1,2)).
+puedeColocar(X,Y-1):- //Tested 
+    (X >= 0 & X < 7) &
+    (tablero(X,Y,1) | tablero(X,Y,2)) &
+    tablero(X,Y-1,0) &
+    (Y >= 0 & Y < 7).
 
-
+puedeColocar(X,7):- //Tested
+    tablero(X,7,0).
+	
 /* Posiciones en las que ganas siempre: +20 */
-ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-
+
+/* Puntuación : */	
+ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,J) &
@@ -41,7 +43,8 @@ ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-
 	puedeColocar(X0,Y) &
 	puedeColocar(X0+4,Y).
 
-ganarSiempreDiagonalAlpha([pos(X0,Y0),pos(X0+4,Y0+4)],J):-
+/* Puntuación : */		
+ganarSiempreDiagonalAlpha([pos(X0,Y0),pos(X0+4,Y0+4)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,J) &
@@ -50,7 +53,8 @@ ganarSiempreDiagonalAlpha([pos(X0,Y0),pos(X0+4,Y0+4)],J):-
 	puedeColocar(X0,Y0) &
 	puedeColocar(X0+4,Y0+4).
 
-ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):-
+/* Puntuación : */		
+ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
@@ -59,50 +63,57 @@ ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):-
 	puedeColocar(X0,Y0) &
 	puedeColocar(X0-4,Y0+4).
 
-
 /* Posiciones en las que tienes un tres en raya con solo una libre: +20*/
-tresEnRayaVertical([pos(X,Y0)],J):-
+
+/* Puntuación : */	
+tresEnRayaVertical([pos(X,Y0)],J):- //Funciona
 	tablero(X,Y0,0) &
 	tablero(X,Y0+1,J) &
 	tablero(X,Y0+2,J) &
 	tablero(X,Y0+3,J).
 
-tresEnRayaHorizontalIzquierda([pos(X0,Y)],J):-
+/* Puntuación : */		
+tresEnRayaHorizontalIzquierda([pos(X0,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,J) &
 	puedeColocar(X0,Y).
 
-tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J):-
+/* Puntuación : */		
+tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,0) &
 	puedeColocar(X0+3,Y).
 
-tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J):-
+/* Puntuación : */	
+tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J):- // Cambiar por derecha Arriba //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,J) &
 	puedeColocar(X0,Y0).
 
-tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J):-
+/* Puntuación : */		
+tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J):- //Cambiar por Izquierda Abajo //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,0) &
 	puedeColocar(X0+3,Y0+3).
 
-tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J):-
+/* Puntuación : */		
+tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0,Y0).
 
-tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J):-
+/* Puntuación : */		
+tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
@@ -111,42 +122,48 @@ tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J):-
 
 /* Posiciones en las que hay tres en cuatro y una para ganar:  */
 
-tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J):-
+/* Puntuación : */	
+tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
 	tablero(X0+3,Y,J) &
 	puedeColocar(X0+2,Y).
 
-tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J):-
+/* Puntuación : */		
+tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,J) &
 	puedeColocar(X0+1,Y).
 
-tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J):-
+/* Puntuación : */		
+tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J):-  //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
 	tablero(X0+3,Y0+3,J) &
 	puedeColocar(X0+2,Y0+2).
 
-tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J):-
+/* Puntuación : */		
+tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,J) &
 	puedeColocar(X0+1,Y0+1).
 
-tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J):-
+/* Puntuación : */		
+tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J):- //cambiar por Izquierda //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,0) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0-2,Y0+2).
 
-tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):-
+/* Puntuación : */		
+tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):- //cambiar por Derecha //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
@@ -156,7 +173,8 @@ tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):-
 
 /* Parejas horizontal que generan un trio que gana siempre: */
 
-parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):-
+/* Puntuación : */	
+parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,J) &
@@ -164,15 +182,17 @@ parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):-
 	tablero(X0+4,Y,0) &
 	puedeColocar(X0+3,Y).
 
-parejaGanadoraHorizontalIzquierda([pos(X0+1,Y)],J):-
+/* Puntuación : */		
+parejaGanadoraHorizontalIzquierda([pos(X0+1,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,J) &
 	tablero(X0+4,Y,0) &
 	puedeColocar(X0+1,Y).
-
-parejaGanadoraHorizontalCentral([pos(X0+2,Y)],J):-
+	
+/* Puntuación : */	
+parejaGanadoraHorizontalCentral([pos(X0+2,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
@@ -180,7 +200,8 @@ parejaGanadoraHorizontalCentral([pos(X0+2,Y)],J):-
 	tablero(X0+4,Y,0) &
 	puedeColocar(X0+2,Y).
 
-parejaGanadoraDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,J) &
@@ -188,7 +209,8 @@ parejaGanadoraDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):-
 	tablero(X0+4,Y0+4,0) &
 	puedeColocar(X0+3,Y0+3).
 
-parejaGanadoraDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,J) &
@@ -196,7 +218,8 @@ parejaGanadoraDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):-
 	tablero(X0+4,Y0+4,0) &
 	puedeColocar(X0+1,Y0+1).
 
-parejaGanadoraDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
@@ -204,7 +227,8 @@ parejaGanadoraDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):-
 	tablero(X0+4,Y0+4,0) &
 	puedeColocar(X0+2,Y0+2).
 
-parejaGanadoraDiagonalBetaIzquierda([pos(X0+3,Y0+3)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalBetaIzquierda([pos(X0-3,Y0+3)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
@@ -212,7 +236,8 @@ parejaGanadoraDiagonalBetaIzquierda([pos(X0+3,Y0+3)],J):-
 	tablero(X0-4,Y0+4,0) &
 	puedeColocar(X0-3,Y0+3).
 
-parejaGanadoraDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
@@ -220,7 +245,8 @@ parejaGanadoraDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):-
 	tablero(X0-4,Y0+4,0) &
 	puedeColocar(X0-1,Y0+1).
 
-parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
+/* Puntuación : */		
+parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,0) &
@@ -230,44 +256,51 @@ parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
 
 
 /* Parejas que generan un trio: */
+
 /* Horizontales */
 
-parejaHorizontalIzquierda([pos(X0+2,Y)],J):-
+/* Puntuación : */	
+parejaHorizontalIzquierda([pos(X0+2,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
 	tablero(X0+3,Y,0) &
 	puedeColocar(X0+2,Y).
 
-parejaHorizontalDerecha([pos(X0+1,Y)],J):-
+/* Puntuación : */	
+parejaHorizontalDerecha([pos(X0+1,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,J) &
 	puedeColocar(X0+1,Y).
 
-parejaHorizontalCentral([pos(X0,Y)],J):-
+/* Puntuación : */		
+parejaHorizontalCentral([pos(X0,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,0) &
 	puedeColocar(X0,Y).
 
-parejaHorizontalSeparadaIzquierda([pos(X0+1,Y)],J):-
+/* Puntuación : */	
+parejaHorizontalSeparadaIzquierda([pos(X0+1,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,J) &
 	tablero(X0+3,Y,0) &
-	puedeColocar(X+1,Y).
-
-parejaHorizontalSeparadaIzquierda([pos(X0+2,Y)],J):-
+	puedeColocar(X0+1,Y).
+	
+/* Puntuación : */	
+parejaHorizontalSeparadaDerecha([pos(X0+2,Y)],J):- //Funciona
 	tablero(X0,Y,0) &
 	tablero(X0+1,Y,J) &
 	tablero(X0+2,Y,0) &
 	tablero(X0+3,Y,J) &
 	puedeColocar(X0+2,Y).
-
-parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
+	
+/* Puntuación : */	
+parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):- //Funciona
 	tablero(X0,Y,J) &
 	tablero(X0+1,Y,0) &
 	tablero(X0+2,Y,0) &
@@ -276,49 +309,56 @@ parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
 
 /* Verticales */
 
-parejaVertical([pos(X0,Y)],J):-
-	tablero(X0,Y,0) &
+/* Puntuación : */	
+parejaVertical([pos(X0,Y)],J):- //Funciona
+	tablero(X0,Y,0) & 
 	tablero(X0,Y+1,J) &
 	tablero(X0,Y+2,J).
 
 /* Diagonales Alpha */ 
 
-parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):-
+/* Puntuación : */	
+parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
 	tablero(X0+3,Y0+3,0) &
 	puedeColocar(X0+2,Y0+2).
 
-parejaDiagonalAlphaDerecha([pos(X0+1,Y0+1)],J):-
+/* Puntuación : */	
+parejaDiagonalAlphaDerecha([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,J) &
 	puedeColocar(X0+1,Y0+1).
 
-parejaDiagonalAlphaCentral([pos(X0,Y0)],J):-
+/* Puntuación : */	
+parejaDiagonalAlphaCentral([pos(X0,Y0)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,0) &
 	puedeColocar(X0,Y0).
-
-parejaDiagonalAlphaSeparadaIzq([pos(X0+1,Y0+1)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalAlphaSeparadaIzq([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,J) &
 	tablero(X0+3,Y0+3,0) &
 	puedeColocar(X0+1,Y0+1).
 
-parejaDiagonalAlphaSeparadaDer([pos(X0+2,Y0+2)],J):-
+/* Puntuación : */	
+parejaDiagonalAlphaSeparadaDer([pos(X0+2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
 	tablero(X0+3,Y0+3,J) &
 	puedeColocar(X0+2,Y0+2).
-
-parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,0) &
 	tablero(X0+2,Y0+2,0) &
@@ -327,48 +367,101 @@ parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
 
 /* Diagonales Beta */
 
-parejaDiagonalBetaIzquierda([pos(X0+2,Y0+2)],J):-
+/* Puntuación : */	
+parejaDiagonalBetaDerecha([pos(X0+2,Y0+2)],J):- //Falla
 	tablero(X0,Y0,J) &
 	tablero(X0+1,Y0+1,J) &
 	tablero(X0+2,Y0+2,0) &
 	tablero(X0+3,Y0+3,0) &
 	puedeColocar(X0+2,Y0+2).
-
-parejaDiagonalBetaDerecha([pos(X0+1,Y0+1)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalBetaIzquierda([pos(X0+1,Y0+1)],J):- //Falla
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0-1,Y0+1).
-
-parejaDiagonalBetaCentral([pos(X0,Y0)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalBetaCentral([pos(X0,Y0)],J):- //Falla
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
 	tablero(X0-3,Y0+3,0) &
 	puedeColocar(X0,Y0).
-
-parejaGeDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):- //Falla
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) J
+	tablero(X0-3,Y0+3,0) &
 	puedeColocar(X0-1,Y0+1).
-
-parejaGeneraTrioDiagonalSeparadaDer([pos(X0-2,Y0+2)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalBetaSeparadaDer([pos(X0-2,Y0+2)],J):- //Falla
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,0) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0-2,Y0+2).
-
-parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):-
+	
+/* Puntuación : */	
+parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,0) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0-1,Y0+1).
 
+/* Posiciones iniciales */
+
+/* Puntuación : */	
+solitaGeneraTodas([pos(X0,Y0)]):-
+	solitaGeneraHorizontal([pos(X0,Y0)])&
+	solitaGeneraVertical([pos(X0,Y0)])&
+	solitaGeneraDiagonalAlpha([pos(X0,Y0)])&
+	solitaGeneraDiagonalBeta([pos(X0,Y0)]).
+/* Puntuación : */	
+solitaGeneraTres([pos(X0,Y0)]):-
+	solitaGeneraHorizontal([pos(X0,Y0)])&
+	solitaGeneraVertical([pos(X0,Y0)])&
+	(solitaGeneraDiagonalAlpha([pos(X0,Y0)]) | solitaGeneraDiagonalBeta([pos(X0,Y0)])).
+/* Puntuación : */	
+solitaGeneraUna([pos(X0,Y0)]):-
+	(solitaGeneraHorizontal([pos(X0,Y0)]) |
+	solitaGeneraVertical([pos(X0,Y0)]) |
+	solitaGeneraDiagonalAlpha([pos(X0,Y0)]) |
+	solitaGeneraDiagonalBeta([pos(X0,Y0)])).
+	
+solitaGeneraHorizontal([pos(X0,Y0)]):-
+	puedeColocar(X0,Y0)&
+	tablero(X0,Y0,0) &
+	tablero(X0+1,Y0,0) & 
+	tablero(X0+2,Y0,0) &
+	tablero(X0+3,Y0,0).
+
+solitaGeneraVertical([pos(X0,Y0)]):-
+	tablero(X0,Y0,0) &
+	tablero(X0,Y0-1,0) & 
+	tablero(X0,Y0-2,0) &
+	tablero(X0,Y0-3,0) &
+	puedeColocar(X0,Y0).
+	
+solitaGeneraDiagonalAlpha([pos(X0,Y0)]):-
+	tablero(X0,Y0,0) &
+	tablero(X0-1,Y0-1,0) & 
+	tablero(X0-2,Y0-2,0) &
+	tablero(X0-3,Y0-3,0) &
+	puedeColocar(X0,Y0).
+	
+solitaGeneraDiagonalBeta([pos(X0,Y0)]):-
+	tablero(X0,Y0,0) &
+	tablero(X0+1,Y0-1,0) & 
+	tablero(X0+2,Y0-2,0) &
+	tablero(X0+3,Y0-3,0) &
+	puedeColocar(X0,Y0).	
 
 /* Calcula una lista de movimientos con su puntuacion */
 calcularMovimientos(8,J,[]).
@@ -395,13 +488,6 @@ calcularPuntuacion(X,Y,J,mov(X,Y,Puntuacion)):-
 /* Devuelve los puntos de estado del tablero */
 //puntos(X,Y,J):-
 
-/*Define quien es el jugador y quien es el rival de forma numérica en función del nombre*/
-//NOT TESTED
-quienSoy(1,2):-
-	  .my_name(player1).
-quienSoy(2,1):-
-	  .my_name(player2).
-	  
 
 /* Initial goals */
 /* Plans */
@@ -425,12 +511,4 @@ quienSoy(2,1):-
 +!minMax(XActual,Profundidad,LMovimientos):
 	Profundidad = 0 <-
 		?calcularMovimientos(LMovimientos).
-		
 
-/*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
-//NOT TESTED
-+!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
-	.put(X,Y-1).
-
-+!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
-	.put(X,Y-1).
