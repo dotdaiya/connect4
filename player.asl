@@ -727,6 +727,7 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 		?calcularMovimientos(LMovimientos).
 		
 
+	
 /*Define elementos iniciales tales como el primer turno*/
 +!definiciones[source(self)]: turno(X) & .my_name(X) <- 
 		+primerTurno("primero");
@@ -734,6 +735,9 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 +!definiciones[source(self)]: turno(X) & not .my_name(X) <- 
 		+primerTurno("segundo");
 		!jugar.
++!definiciones[source(self)]<- 
+		.wait(50); 
+		!definiciones.
 		
 /*Gestiona el cambio de turno en función del nombre del agente*/
 /*Gestiona la partida cuando juega a ganar y empieza primero*/
@@ -747,7 +751,7 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 +!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player2) & 
 	estrategia(jugarAGanar)[source(percept)] & primerTurno("segundo")[source(self)]<- .print("hi").
 
-/*Gestiona la partida cuando juega a perder y empieza segundo*/
+/*Gestiona la partida cuando juega a perder y empieza primero*/
 +!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player1) & 
 	estrategia(jugarAPerder)[source(percept)]  & primerTurno("primero")[source(self)]<- .print("hi").
 +!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player2) & 
@@ -761,7 +765,7 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 
 /*Si es el turno del oponente no hace nada*/
 +!jugar[source(self)]: turno(X)[source(percept)] & .my_name(Y) & not (X = Y)<- 
-		wait(50);
+		.wait(50);
 		!jugar. 
 
 /*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
