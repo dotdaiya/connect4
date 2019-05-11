@@ -1,7 +1,4 @@
 // Internal action code for project connect4.mas2j
-
-
-
 package testing;
 
 
@@ -19,11 +16,9 @@ import java.io.FileNotFoundException;
 
 public class add_rules extends DefaultInternalAction {
 
-
 	private String test_file_path = "player.asl";
 	
     @Override
-
     public Object execute(TransitionSystem ts, Unifier un, Term[] args) throws Exception {
 
         

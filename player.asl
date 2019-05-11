@@ -1,18 +1,20 @@
 // Agent player in project connect4.mas2j
 
+/* ALPHA: Es una diagonal en la que las dos componentes son la suma de las 
+   anteriores. Es decir la diagonal va de izquierda arriba a abajo derecha.
+  
+ * BETA: Es una diagonal en la que la componenet X es la resta de la anterior
+   y la componente Y la suma de la anterior. Es decir la diagonal va de derecha
+   arriba a abajo izquierda.*/
 
+/* BELIEFS AND RULES */
 
-/* Initial beliefs and rules */
+/*----------------------------BELIEFS INICIALES-------------------------------*/
 
+mejorMovimiento(mov(-1,-1,-100000)). // El mejor movimiento a realizar
+profundidad(3). // La profundidad de búsqueda del árbol minmax
 
-/*ALPHA: Es una diagonal en la que las dos componentes son la suma de las 
-  anteriores. Es decir la diagonal va de izquierda arriba a abajo derecha. */
-
-
-/*BETA: Es una diagonal en la que la componenet X es la resta de la anterior
-  y la componente Y la suma de la anterior. Es decir la diagonal va de derecha
-  arriba a abajo izquierda.
-
+/*----------------------------------------------------------------------------*/
 
 /* Calcula si un celda esta ocupada por el rival o fuera del tablero */
 /* Falta implementar jugadorOponente(J) */
@@ -22,399 +24,183 @@ ocupadoFueraDeTablero(X,Y,J):-
 	tablero(X,Y,jugadorOponente(J)).
 
 
-/* Comprueba si se puede colocar en una posición por encima de la fila siete */
-puedeColocar(X,0).
+// Comprueba si se puede colocar en una posición por encima de la fila siete 
+puedeColocar(X,Y-1):- //Tested 
+	(X >= 0 & X < 7) &
+	(tablero(X,Y,1) | tablero(X,Y,2)) &
+	tablero(X,Y-1,0) &
+	(Y >= 0 & Y < 7).
 
-puedeColocar(X,Y):-
-	(Y > 0) &
-	(tablero(X,Y-1,1) |
-	tablero(X,Y-1,2)).
-
-
-/* Posiciones en las que ganas siempre: +20 */
-ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,J) &
-	tablero(X0+4,Y,0) &
-	puedeColocar(X0,Y) &
-	puedeColocar(X0+4,Y).
-
-ganarSiempreDiagonalAlpha([pos(X0,Y0),pos(X0+4,Y0+4)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,J) &
-	tablero(X0+4,Y0+4,0) &
-	puedeColocar(X0,Y0) &
-	puedeColocar(X0+4,Y0+4).
-
-ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,J) &
-	tablero(X0-4,Y0+4,0) &
-	puedeColocar(X0,Y0) &
-	puedeColocar(X0-4,Y0+4).
+puedeColocar(X,7):- //Tested
+	tablero(X,7,0).
 
 
-/* Posiciones en las que tienes un tres en raya con solo una libre: +20*/
-tresEnRayaVertical([pos(X,Y0)],J):-
-	tablero(X,Y0,0) &
-	tablero(X,Y0+1,J) &
-	tablero(X,Y0+2,J) &
-	tablero(X,Y0+3,J).
+/* Comprueba que aún se puede realizar movimientos */
+comprobarCeldasLibres:- //Tested
+	tablero(X,Y,0).
 
-tresEnRayaHorizontalIzquierda([pos(X0,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0,Y).
+/* Comprueba que aún hay celdas libres en una columna */
+comprobarCeldaLibreEnColumna(Columna,Fila):-
+	(Columna >= 0 & Columna < 8) &
+	puedeColocar(Columna,Fila).
 
-tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,0) &
-	puedeColocar(X0+3,Y).
+/* Comprueba si hay un belief de tmpTablero sino coge el percept */
+posicion(X,Y,J):-
+	tmpTablero(X,Y,J).
 
-tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0,Y0).
+posicion(X,Y,J):-
+	tablero(X,Y,J)[source(percept)].
 
-tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0+3,Y0+3).
+/* Comprueba si hay un cuatro en raya en el tablero */
+cuatroEnRayaVertical(J):- //Tested
+	posicion(X,Y,J) &
+	posicion(X,Y+1,J) &
+	posicion(X,Y+2,J) &
+	posicion(X,Y+3,J).
 
-tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0,Y0).
+cuatroEnRayaHorizontal(J):- //Tested
+	posicion(X,Y,J) &
+	posicion(X+1,Y,J) &
+	posicion(X+2,Y,J) &
+	posicion(X+3,Y,J).
 
-tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) &
-	puedeColocar(X0-3,Y0+3).
+cuatroEnRayaDiagonalAlpha(J):- //Tested
+	posicion(X,Y,J) &
+	posicion(X+1,Y+1,J) &
+	posicion(X+2,Y+2,J) &
+	posicion(X+3,Y+3,J).
 
-/* Posiciones en las que hay tres en cuatro y una para ganar:  */
+cuatroEnRayaDiagonalBeta(J):- //Tested
+	posicion(X,Y,J) &
+	posicion(X-1,Y+1,J) &
+	posicion(X-2,Y+2,J) &
+	posicion(X-3,Y+3,J).
 
-tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,0) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0+2,Y).
+/* Comprueba que nadie haya ganado la partida */
+nadieGano:- //Tested
+	not cuatroEnRayaHorizontal(1) &
+	not cuatroEnRayaVertical(1) &
+	not cuatroEnRayaDiagonalAlpha(1) &
+	not cuatroEnRayaDiagonalBeta(1) &
+	not cuatroEnRayaHorizontal(2) &
+	not cuatroEnRayaVertical(2) &
+	not cuatroEnRayaDiagonalAlpha(2) &
+	not cuatroEnRayaDiagonalBeta(2).
 
-tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,0) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0+1,Y).
+/*Minimizar la puntuación de una lista de movimientos */
+minimizarLista(X,[],X). //TESTED
 
-tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0+2,Y0+2).
+minimizarLista(mov(X0,Y0,Puntos0),[mov(X1,Y1,Puntos1)|Tail],Puntos):-
+	Puntos1 <= Puntos0 &
+	minimizarLista(mov(X1,Y1,Puntos1),Tail,Puntos).
 
-tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,0) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0+1,Y0+1).
+minimizarLista(mov(X0,Y0,Puntos0),[mov(X,Y,Puntos1)|Tail],Puntos):-
+	Puntos1 > Puntos0 &
+	minimizarLista(mov(X0,Y0,Puntos0),Tail,Puntos).
 
-tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,0) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0-2,Y0+2).
+/*Minimizar la puntuación de una lista de movimientos */
+maximizarLista(X,[],X). //TESTED
 
-tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0-1,Y0+1,0) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0-1,Y0+1).
+maximizarLista(mov(X0,Y0,Puntos0),[mov(X1,Y1,Puntos1)|Tail],Puntos):-
+	Puntos1 >= Puntos0 &
+	maximizarLista(mov(X1,Y1,Puntos1),Tail,Puntos).
 
+maximizarLista(mov(X0,Y0,Puntos0),[mov(X,Y,Puntos1)|Tail],Puntos):-
+	Puntos1 < Puntos0 &
+	maximizarLista(mov(X0,Y0,Puntos0),Tail,Puntos).
 
-/* Parejas horizontal que generan un trio que gana siempre: */
+/* Si ya se recorrieron todas las columnas */
+nodosTerminales(Columna,Jugador,Estrategia,[]):-
+	(Columna >= 8).
 
-parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,0) &
-	tablero(X0+4,Y,0) &
-	puedeColocar(X0+3,Y).
+/* Si no se puede colocar ninguna ficha mas y no hay ganador */
+nodosTerminales(Columna,Jugador,Estrategia,mov(-1,-1,0)):-
+	(Columna >= 0 & Columna < 8) &
+	not comprobarCeldasLibres &
+	nadieGano.
 
-parejaGanadoraHorizontalIzquierda([pos(X0+1,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,0) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,J) &
-	tablero(X0+4,Y,0) &
-	puedeColocar(X0+1,Y).
+/* Si no se puede colocar ninguna ficha mas y hay ganador */
+nodosTerminales(Columna,Jugador,Estrategia,mov(-1,-1,0)):-
+	(Columna >= 0 & Columna < 8) &
+	not comprobarCeldasLibres &
+	nadieGano.
 
-parejaGanadoraHorizontalCentral([pos(X0+2,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,0) &
-	tablero(X0+3,Y,J) &
-	tablero(X0+4,Y,0) &
-	puedeColocar(X0+2,Y).
+/* Si no se puede colocar en esa columna */
+nodosTerminales(Columna,Jugador,Estrategia,LMovimientos):-
+	(Columna >= 0 & Columna < 8) &
+	not comprobarCeldaLibreEnColumna(Columna,Fila) &
+	nodosTerminales(Columna+1,Jugador,Estrategia,LMovimientos).
 
-parejaGanadoraDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,0) &
-	tablero(X0+4,Y0+4,0) &
-	puedeColocar(X0+3,Y0+3).
+/* Para cada movimiento */
+nodosTerminales(Columna,Jugador,Estrategia,[mov(Columna,Fila,Puntos)|LMovimientos]):-
+	(Columna >= 0 & Columna < 8) &
+	comprobarCeldaLibreEnColumna(Columna,Fila) &
+	.asserta(tmpTablero(Columna,Fila,J)) &
+	evaluarTablero(Jugador,Estrategia,Puntos) &
+	.abolish(tmpTablero(Columna,Fila,J)) &
+	nodosTerminales(Columna+1,Jugador,Estrategia,LMovimientos).
 
-parejaGanadoraDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,0) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,J) &
-	tablero(X0+4,Y0+4,0) &
-	puedeColocar(X0+1,Y0+1).
+/* Para nodos terminales - Maximizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	Profundidad = 0 & 
+	Maximizar &
+	nodosTerminales(0,Jugador,Estrategia,LMovimientos) &
+	maximizarLista(mov(-1,-1,-5000),LMovimientos,Puntos).
 
-parejaGanadoraDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,J) &
-	tablero(X0+4,Y0+4,0) &
-	puedeColocar(X0+2,Y0+2).
+/* Para nodos terminales - Minimizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	Profundidad = 0 & 
+	not Maximizar &
+	nodosTerminales(0,Jugador,Estrategia,LMovimientos) &
+	maximizarLista(mov(-1,-1,5000),LMovimientos,Puntos).
 
-parejaGanadoraDiagonalBetaIzquierda([pos(X0+3,Y0+3)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) &
-	tablero(X0-4,Y0+4,0) &
-	puedeColocar(X0-3,Y0+3).
+/* Si gana o pierde devuelve ese movimiento */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	estrategia(Estrategia) &
+	evaluarTablero(Jugador,Estrategia,Puntos) &
+	(Puntos = 50 | Puntos = -50).
 
-parejaGanadoraDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,0) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,J) &
-	tablero(X0-4,Y0+4,0) &
-	puedeColocar(X0-1,Y0+1).
+/* En caso de empate */
+minMax(Jugador,Profundidad,0,Maximizar):-
+	estrategia(Estrategia)[source(self)] &
+	not comprobarCeldasLibres.
 
-parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,0) &
-	tablero(X0-3,Y0+3,J) &
-	tablero(X0-4,Y0+4,0) &
-	puedeColocar(X0-2,Y0+2).
+/* Turno de maximizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	estrategia(Estrategia)[source(self)] &
+	Maximizar &
+	iterar(0,Profundidad-1,not true,LMovimientos) &
+	maximizarLista(LMovimientos,Puntos).
+
+/* Turno de minimizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	estrategia(Estrategia)[source(self)] &
+	not Maximizar &
+	iterar(0,Profundidad-1,true,LMovimientos) &
+	minimizarLista(LMovimientos,Puntos).
 
 
-/* Parejas que generan un trio: */
-/* Horizontales */
+/* Para cada movimiento */
+iterar(Columna,Profundidad,Maximizar,[Puntos|LMovimientos]):-
+	(Columna >= 0 & Columna < 8) &
+	comprobarCeldasLibres &
+	.asserta(tmpTablero(Columna,Fila,J)) &
+	minMax(Jugador,Profundidad,Puntos,Maximizar) &
+	.abolish(tmpTablero(Columna,Fila,J)) &
+	iterar(Columna+1,Profundidad,Maximizar,LMovimientos).
 
-parejaHorizontalIzquierda([pos(X0+2,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,0) &
-	tablero(X0+3,Y,0) &
-	puedeColocar(X0+2,Y).
-
-parejaHorizontalDerecha([pos(X0+1,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,0) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0+1,Y).
-
-parejaHorizontalCentral([pos(X0,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,0) &
-	puedeColocar(X0,Y).
-
-parejaHorizontalSeparadaIzquierda([pos(X0+1,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,0) &
-	tablero(X0+2,Y,J) &
-	tablero(X0+3,Y,0) &
-	puedeColocar(X+1,Y).
-
-parejaHorizontalSeparadaIzquierda([pos(X0+2,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0+1,Y,J) &
-	tablero(X0+2,Y,0) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0+2,Y).
-
-parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
-	tablero(X0,Y,J) &
-	tablero(X0+1,Y,0) &
-	tablero(X0+2,Y,0) &
-	tablero(X0+3,Y,J) &
-	puedeColocar(X0+1,Y).
-
-/* Verticales */
-
-parejaVertical([pos(X0,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0,Y+1,J) &
-	tablero(X0,Y+2,J).
-
-/* Diagonales Alpha */ 
-
-parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0+2,Y0+2).
-
-parejaDiagonalAlphaDerecha([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,0) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0+1,Y0+1).
-
-parejaDiagonalAlphaCentral([pos(X0,Y0)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0,Y0).
-
-parejaDiagonalAlphaSeparadaIzq([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,0) &
-	tablero(X0+2,Y0+2,J) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0+1,Y0+1).
-
-parejaDiagonalAlphaSeparadaDer([pos(X0+2,Y0+2)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0+2,Y0+2).
-
-parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,0) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,J) &
-	puedeColocar(X0+1,Y0+1).
-
-/* Diagonales Beta */
-
-parejaDiagonalBetaIzquierda([pos(X0+2,Y0+2)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0+2,Y0+2).
-
-parejaDiagonalBetaDerecha([pos(X0+1,Y0+1)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,0) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0-1,Y0+1).
-
-parejaDiagonalBetaCentral([pos(X0,Y0)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) &
-	puedeColocar(X0,Y0).
-
-parejaGeDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0-1,Y0+1,0) &
-	tablero(X0-2,Y0+2,J) &
-	tablero(X0-3,Y0+3,0) J
-	puedeColocar(X0-1,Y0+1).
-
-parejaGeneraTrioDiagonalSeparadaDer([pos(X0-2,Y0+2)],J):-
-	tablero(X0,Y0,0) &
-	tablero(X0-1,Y0+1,J) &
-	tablero(X0-2,Y0+2,0) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0-2,Y0+2).
-
-parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):-
-	tablero(X0,Y0,J) &
-	tablero(X0-1,Y0+1,0) &
-	tablero(X0-2,Y0+2,0) &
-	tablero(X0-3,Y0+3,J) &
-	puedeColocar(X0-1,Y0+1).
-
-
-/* Calcula una lista de movimientos con su puntuacion */
-calcularMovimientos(8,J,[]).
-
-calcularMovimientos(Columna,J,[MovPunt|LMovPunt]):-
-	Columna < 8 &
-	calcularFichaSuperior(Columna,X,Y) &
-	calcularPuntuacion(X,Y,J,MovPunt) &
-	calcularMovimientos(Columna+1,J,LMovPunt).
-
-calcularMovimientos(Columna,J,LFinal):-
-	Columna < 8 &
-	not(calcularFichaSuperior(Columna,X,Y)) &
-	calcularMovimientos(Columna+1,J,LFinal).
-
-
-/* Movimiento-puntuacion = mov(X,Y,Puntuacion) */
-calcularPuntuacion(X,Y,J,mov(X,Y,Puntuacion)):-
-	.asserta(tmpTablero(X,Y,J)) &
-	puntos(Puntuacion) &
-	.abolish(tmpTablero(X,Y,J)).
+/* Ya se recorrieron todas las posibilidades de movimientos */
+iterar(Columna,Profundidad,Maximizar,[]):-
+	(Columna >= 8).
 
 
 /* Devuelve los puntos de estado del tablero */
-//puntos(X,Y,J):-
+evaluarTablero(Jugador,Estrategia,5). // Falta implementar
+
+/* INITIAL GOALS */
+/* PLANS */
 
 
-/* Initial goals */
-/* Plans */
 
-//NOT TESTED
-+!minMax(XActual,Profundidad,LMovimientos):
-	Profundidad > 0 &
-	esPar(Profundidad) &
-	XActual < 7 <-
-		!minMax(XActual,Profundidad-1,LMovimientos);
-		!minMax(XActual + 1, Profundidad,LMovimientos2).
-
-+!minMax(XActual,Profundidad,LMovimientos):
-	Profundidad > 0 &
-	not(esPar(Profundidad)) &
-	XActual < 7 <-
-		!minMax(XActual,Profundidad-1,LMovimientos);
-		!minMax(XActual + 1, Profundidad,LMovimientos2).
-
-
-+!minMax(XActual,Profundidad,LMovimientos):
-	Profundidad = 0 <-
-		?calcularMovimientos(LMovimientos).
+/*---------------------------------ERRORES------------------------------------*/
+/*----------------------------------------------------------------------------*/
