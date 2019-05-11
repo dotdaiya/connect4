@@ -727,10 +727,34 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 		?calcularMovimientos(LMovimientos).
 		
 
+/*Gestiona el cambio de turno en función del nombre del agente*/
+/*Gestiona la partida cuando juega a ganar y empieza primero*/
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAganar) & primerTurno("primero")<- .print("hi").
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player2) & estrategia(jugarAganar) & primerTurno("primero")<- .print("hi").
+
+
+/*Gestiona la partida cuando juega a ganar y empieza segundo*/
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAganar) & primerTurno("segundo")<- .print("hi").
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player2) & estrategia(jugarAganar) & primerTurno("segundo")<- .print("hi").
+
+/*Gestiona la partida cuando juega a perder y empieza segundo*/
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAperder) & primerTurno("primero")<- .print("hi").
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player2) & estrategia(jugarAperder) & primerTurno("primero")<- .print("hi").
+
+/*Gestiona la partida cuando juega a perder y empieza segundo*/
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAperder) & primerTurno("segundo")<- !jugarAperderSegundo.
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player2) & estrategia(jugarAperder) & primerTurno("segundo")<- !jugarAperderSegundo.
+
+/*Si es el turno del oponente no hace nada*/
++!jugar[source(self)]: turno(X) & .my_name(X) & not (X = player1)<- 
+		wait(50);
+		!jugar. 
+
 /*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
 //NOT TESTED
-+!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
-	put(X).
++!jugarAperderSegundo[source(self)]:quienSoy(Jugador,Rival) & tablero(X,Y,Rival) & tablero(X,Y-1,0) <-
+	put(X);
+	!jugar.
 	
 
 
