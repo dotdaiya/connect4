@@ -415,43 +415,74 @@ y candidatos ganadores siempre y ponderando su valor*/
 
 /*Obtiene la puntuacion total del tablero*/
 //NOT TESTED
-puntuacionTotal(P+Q+R,Jugador,jugarAganar):-
+puntuacionTotal(Puntuacion,Jugador,jugarAganar):-
 	puntuacionParejas(P,Jugador) &
 	puntuacionGanarSiempre(Q,Jugador) &
-	puntuacionTrios(R,Jugador).
+	puntuacionTrios(R,Jugador) &
+	puntuacionComunes(S,Jugador) &
+	Puntuacion = P+Q+R+S.
+puntuacionTotal(0,Jugador,jugarAganar).//Puntuacion por defecto si no encuentra parejas
 
-/*Obtiene la puntuacion de las parejas encontradas*/	
+/*Obtiene la puntuacion de las parejas encontradas
+
+	Horizontales:15 
+	Diagonales:20
+	Verticales:10
+	Generan trios Horizontales:60
+	Generan trios Diagonales:65
+	*/	
 //NOT TESTED	
-puntuacionParejas(Puntuacion+Puntuacion2,Jugador):-
-	parejas(Lista1,Jugador) &
-	parejasTriosGanadoras(Lista2,Jugador) &
+puntuacionParejas(Total,Jugador):-
+	parejasHorizontales(Lista1,Jugador) &
+	parejasTriosGanadorasH(Lista2,Jugador) &
+	parejasTriosGanadorasD(Lista3,Jugador) &
+	parejasDiagonales(Lista4,Jugador) &
+	parejaVertical(Lista5,Jugador) & 
 	.length(Lista1,Puntuacion) &
-	.lengt(Lista2,Puntuacion2).
+	.length(Lista2,Puntuacion2) &
+	.length(Lista3,Puntuacion3) &
+	.length(Lista4,Puntuacio4) &
+	.length(Lista5,Puntuacio5) &
+	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacio4*20 + Puntuacion5*10.
 	
-/*Obtiene la puntuacion de los candidatos a ganar siempre*/
+/*Obtiene la puntuacion de los candidatos a ganar siempre 90/100 */
 //NOT TESTED
-puntuacionGanarSiempre(Puntuacion,Jugador):-
+puntuacionGanarSiempre(Total,Jugador):-
 	ganarSiempre(L,Jugador) &
-	.length(L,Puntuacion).
-/*Obtiene la puntuacion de los trios encontrados*/
+	.length(L,Puntuacion) &
+	Total = Puntuacion*90.
+/*
+	Obtiene la puntuacion de los trios encontrados
+			trio que les falta una para ganar 85
+			trios que ganan en Diagonal 75
+			trios que ganan en Horizontal 70
+			trios verticales 60
+	*/
 //NOT TESTED
-puntuacionTrios(Puntuacion+Puntuacion2,Jugador):-
-	trios(L,Jugador) &
-	.length(L,Puntuacion)&
-	triosGanan(M,Jugador) &
-	.length(M,Puntuacion2).
+puntuacionTrios(Total,Jugador):-
+	trios(Lista1,Jugador) &
+	triosGananH(Lista2,Jugador) &
+	triosGananD(Lista3,Jugador) &
+	tresEnRayaVertical(Lista4,J) &
+	.length(Lista1,Puntuacion)&
+	.length(Lista2,Puntuacion2)&
+	.length(Lista3,Puntuacion3)&
+	.length(Lista4,Puntuacion4)&
+	Total = Puntuacion*85 + Puntuacion2*75 + Puntuacion3*70 + Puntuacion4*60.
 	  
 
 /*Halla las parejas disponibles en el tablero*/
 //NOT TESTED
-parejas([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T],J):-
+parejasHorizontales([A,B,C,D,E,F],J):-
 	parejaHorizontalIzquierda(A,J) &
 	parejaHorizontalDerecha(B,J) &
 	parejaHorizontalCentral(C,J) &
 	parejaHorizontalSeparadaIzquierda(D,J) &
 	parejaHorizontalSeparadaIzquierda(E,J) &
-	parejaHorizontalSeparadaCentro(F,J) &
-	parejaVertical(G,J) &
+	parejaHorizontalSeparadaCentro(F,J).
+	
+	
+parejasDiagonales([H,I,K,L,M,N,O,P,Q,R,S,T],J):-
 	parejaDiagonalAlphaIzquierda(H,J) &
 	parejaDiagonalAlphaDerecha(I,J) &
 	parejaDiagonalAlphaCentral(K,J) &
@@ -463,14 +494,15 @@ parejas([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T],J):-
 	parejaDiagonalBetaCentral(Q,J) &
 	parejaGeDiagonalBetaSeparadaIzq(R,J) &
 	parejaGeneraTrioDiagonalSeparadaDer(S,J) &
-	parejaDiagonalBetaSeparadaCentro(T,J). 
-
+	parejaDiagonalBetaSeparadaCentro(T,J).
+	
 /* Halla las parejas que generan un trio que ganan siempre */
 //NOT TESTED
-parejasTriosGanadoras([A,B,C,D,E,F,G,H,I],Jugador):-
+parejasTriosGanadorasH([A,B,C],J):-
 	parejaGanadoraHorizontalDerecha(A,J) &
 	parejaGanadoraHorizontalIzquierda(B,J) &
-	parejaGanadoraHorizontalCentral(C,J) &
+	parejaGanadoraHorizontalCentral(C,J).
+parejasTriosGanadorasD([D,E,F,G,H,I],J):-
 	parejaGanadoraDiagonalAlphaDerecha(D,J)&
 	parejaGanadoraDiagonalAlphaIzquierda(E,J) &
 	parejaGanadoraDiagonalAlphaCentral(F,J) &
@@ -490,14 +522,15 @@ trios([A,B,C,D,E,F],J):-
 	
 /*Posiciones en las que tienes un tres en raya con solo una libre*/
 //NOT TESTED
-triosGanan([A,B,C,D,E,F,G],J):-	
-	tresEnRayaVertical(A,J) &
-	tresEnRayaHorizontalIzquierda(B,J) &
-	tresEnRayaHorizontalDerecha(C,J) &
+triosGananD([D,E,F,G],J):-	
 	tresEnRayaDiagonalAlphaDerechaAbajo(D,J) &
 	tresEnRayaDiagonalAlphaIzquierdaArriba(E,J) &
 	tresEnRayaDiagonalBetaDerechaArriba(F,J) &
 	tresEnRayaDiagonalBetaIzquierdaAbajo(G,J).
+triosGananH([B,C],J):-	
+	tresEnRayaHorizontalIzquierda(B,J) &
+	tresEnRayaHorizontalDerecha(C,J).
+
 	
 /*Halla los trios que ganan siempre*/
 //NOT TESTED
@@ -508,33 +541,65 @@ ganarSiempre([A,B,C],J):-
 
 /*Halla las jugadas comunes*/
 //NOT TESTED
-jugadasComunes(Jugador,Puntuacion):-
-		parejas(ListaParejas,Jugador) &
-		parejasTriosGanadoras(ListaParejasTrioGanan,Jugador) &
-		ganarSiempre(ListaGanaSiempre,Jugador) &
-		trios(ListaTrios,Jugador) &
-		triosGanan(ListaTriosGanan,Jugador) &
+jugadasComunes(Puntuacion,Jugador):-
+		parejasHorizontales(ParejasH,Jugador) &
+		parejasDiagonales(ParejasD,Jugador) &
+		parejaVertical(ParejasV,Jugador) & 
+		parejasTriosGanadorasH(ParejasTrioGananH,Jugador) &
+		parejasTriosGanadorasD(ParejasTrioGananD,Jugador) &
 		
-		busqueda(ListaParejas,ListaParejasTrioGanan,P1) &
-		busqueda(ListaParejas,ListaGanaSiempre,P2) &
-		busqueda(ListaParejas,ListaTrios,P3) &
-		busqueda(ListaParejas,ListaTriosGanan,P4) &
- 
-		busqueda(ListaParejasTrioGanan,ListaGanaSiempre,P5) &
-		busqueda(ListaParejasTrioGanan,ListaTrios,P6) &
-		busqueda(ListaParejasTrioGanan,ListaTriosGanan,P7) &
+		trios(Trios3en4,Jugador) &
+		tresEnRayaVertical(TriosVertical,Jugador) &
+		triosGananH(TriosGananH,Jugador) &
+		triosGananD(TriosGananD,Jugador) &
 		
-		busqueda(ListaGanaSiempre,ListaTrios,P8) &
-		busqueda(ListaGanaSiempre,ListaTriosGanan,P9) &
+		busqueda(ParejasH,ParejasD,P1) &
+		busqueda(ParejasH,ParejasV,P2) &
+		busqueda(ParejasH,ParejasTrioGananH,P3) &
+		busqueda(ParejasH,ParejasTrioGananH,P4) &
+		busqueda(ParejasH,Trios3en4,P5) &
+		busqueda(ParejasH,TriosVertical,P6) &
+		busqueda(ParejasH,TriosGananH,P7) &
+		busqueda(ParejasH,TriosGananD,P8) &
+		busqueda(ParejasD,ParejasV,P9) &
+		busqueda(ParejasD,ParejasTrioGananH,P10) &
+		busqueda(ParejasD,ParejasTrioGananD,P11) &
+		busqueda(ParejasD,Trios3en4,P12) &
+		busqueda(ParejasD,TriosVertical,P13) &
+		busqueda(ParejasD,TriosGananH,P14) &
+		busqueda(ParejasD,TriosGananD,P15) &
+		busqueda(ParejasV,ParejasTrioGananH,P16) &
+		busqueda(ParejasV,ParejasTrioGananD,P17) &
+		busqueda(ParejasV,Trios3en4,P18) &
+		busqueda(ParejasV,TriosVertical,P19) &
+		busqueda(ParejasV,TriosGananH,P20) &
+		busqueda(ParejasV,TriosGananD,P21) &
+		busqueda(ParejasTrioGananH,ParejasTrioGananD,P22) &
+		busqueda(ParejasTrioGananH,Trios3en4,P23) &
+		busqueda(ParejasTrioGananH,TriosVertical,P24) &
+		busqueda(ParejasTrioGananH,TriosGananH,P25) &
+		busqueda(ParejasTrioGananH,TriosGananD,P26) &
+		busqueda(ParejasTrioGananD,Trios3en4,P27) &
+		busqueda(ParejasTrioGananD,TriosVertical,P28) &
+		busqueda(ParejasTrioGananD,TriosGananH,P29) &
+		busqueda(ParejasTrioGananD,TriosGananD,P30) &
+		busqueda(Trios3en4,TriosVertical,P31) &
+		busqueda(Trios3en4,TriosGananH,P32) &
+		busqueda(Trios3en4,TriosGananD,P33) &
+		busqueda(TriosVertical,TriosGananH,P34) &
+		busqueda(TriosVertical,TriosGananD,P35) &
+		busqueda(TriosGananH,TriosGananD,P36) &
+		unoMismoComunes(ParejasH,ParejasH,P37) &
+		unoMismoComunes(ParejasD,ParejasD,P38) &
+		unoMismoComunes(ParejasV,ParejasV,P39) &
+		unoMismoComunes(ParejasTrioGananH,ParejasTrioGananH,P40) &
+		unoMismoComunes(ParejasTrioGananD,ParejasTrioGananD,P41) &
+		unoMismoComunes(Trios3en4,Trios3en4,P42) &
+		unoMismoComunes(TriosVertical,TriosVertical,P43) &
+		unoMismoComunes(TriosGananH,TriosGananH,P44) &
+		unoMismoComunes(TriosGananD,TriosGananD,P45) &
 		
-		busqueda(ListaTrios,ListaTriosGanan,P10) &
-		
-		unoMismoComunes(ListaParejas,ListaParejas,P11) &
-		unoMismoComunes(ListaParejasTrioGanan,ListaParejasTrioGanan,P12) &
-		unoMismoComunes(ListaGanaSiempre,ListaGanaSiempre,P13) &
-		unoMismoComunes(ListaTrios,ListaTrios,P14) &
-		unoMismoComunes(ListaTriosGanan,ListaTriosGanan,P15) &
-		Puntuacion = P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P13 + P14 + P15. 
+		Puntuacion = P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P13 + P14 + P15 + P16 + P17 + P18 + P19 + P20 + P21 + P22 + P23 + P24 + P25 + P26 + P27 + P28 + P29 + P30 + P31 + P32 + P33 + P34 + P35 + P36 + P37 + P38 + P39 + P40 + P41 + P42 + P43 + P44 + P45. 
 
 
 	  	
