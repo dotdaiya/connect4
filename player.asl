@@ -405,7 +405,43 @@ quienSoy(1,2):-
 	  .my_name(player1).
 quienSoy(2,1):-
 	  .my_name(player2).
+	 
 	  
+/***************************************************************************/
+/****************	PUNTUACION TABLERO  ***********************************/
+/*************************************************************************/
+/*Obtener las puntuaciones del tablero contando el numero de trios, parejas 
+y candidatos ganadores siempre y ponderando su valor*/
+
+/*Obtiene la puntuacion total del tablero*/
+//NOT TESTED
+puntuacionTotal(P+Q+R,Jugador,jugarAganar):-
+	puntuacionParejas(P,Jugador) &
+	puntuacionGanarSiempre(Q,Jugador) &
+	puntuacionTrios(R,Jugador).
+
+/*Obtiene la puntuacion de las parejas encontradas*/	
+//NOT TESTED	
+puntuacionParejas(Puntuacion+Puntuacion2,Jugador):-
+	parejas(Lista1,Jugador) &
+	parejasTriosGanadoras(Lista2,Jugador) &
+	.length(Lista1,Puntuacion) &
+	.lengt(Lista2,Puntuacion2).
+	
+/*Obtiene la puntuacion de los candidatos a ganar siempre*/
+//NOT TESTED
+puntuacionGanarSiempre(Puntuacion,Jugador):-
+	ganarSiempre(L,Jugador) &
+	.length(L,Puntuacion).
+/*Obtiene la puntuacion de los trios encontrados*/
+//NOT TESTED
+puntuacionTrios(Puntuacion+Puntuacion2,Jugador):-
+	trios(L,Jugador) &
+	.length(L,Puntuacion)&
+	triosGanan(M,Jugador) &
+	.length(M,Puntuacion2).
+	  
+
 /*Halla las parejas disponibles en el tablero*/
 //NOT TESTED
 parejas([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T],J):-
@@ -429,8 +465,8 @@ parejas([A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T],J):-
 	parejaGeneraTrioDiagonalSeparadaDer(S,J) &
 	parejaDiagonalBetaSeparadaCentro(T,J). 
 
-	/* Halla las parejas que generan un trio que ganan siempre */
-	//NOT TESTED
+/* Halla las parejas que generan un trio que ganan siempre */
+//NOT TESTED
 parejasTriosGanadoras([A,B,C,D,E,F,G,H,I],Jugador):-
 	parejaGanadoraHorizontalDerecha(A,J) &
 	parejaGanadoraHorizontalIzquierda(B,J) &
@@ -442,6 +478,27 @@ parejasTriosGanadoras([A,B,C,D,E,F,G,H,I],Jugador):-
 	parejaGanadoraDiagonalBetaDerecha(H,J) &
 	parejaGanadoraDiagonalBetaCentral(I,J).
 	
+/*Halla los trios en el tablero donde hay tres en cuatro y falta una para ganar*/
+//NOT TESTED
+trios([A,B,C,D,E,F],J):-
+	tresEnCuatroHorizontalCentroDerecha(A,J) &
+	tresEnCuatroHorizontalCentroIzquierda(B,J) &
+	tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
+	tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
+	tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
+	tresEnCuatroDiagonalBetaCentroIzquierda(F,J).
+	
+/*Posiciones en las que tienes un tres en raya con solo una libre*/
+//NOT TESTED
+triosGanan([A,B,C,D,E,F,G],J):-	
+	tresEnRayaVertical(A,J) &
+	tresEnRayaHorizontalIzquierda(B,J) &
+	tresEnRayaHorizontalDerecha(C,J) &
+	tresEnRayaDiagonalAlphaDerechaAbajo(D,J) &
+	tresEnRayaDiagonalAlphaIzquierdaArriba(E,J) &
+	tresEnRayaDiagonalBetaDerechaArriba(F,J) &
+	tresEnRayaDiagonalBetaIzquierdaAbajo(G,J).
+	
 /*Halla los trios que ganan siempre*/
 //NOT TESTED
 ganarSiempre([A,B,C],J):-
@@ -449,27 +506,6 @@ ganarSiempre([A,B,C],J):-
 	ganarSiempreDiagonalAlpha(B,J) &
 	ganarSiempreDiagonalBeta(C,J).
 
-/*Obtener las puntuaciones*/
-
-/*Valora los estados actuales del tablero*/
-//NOT TESTED
-puntuacionTotal(P+Q,Jugador,jugarAganar):-
-	puntuacionParejas(P,Jugador) &
-	puntuacionGanar(Q,Jugador).
-/*Por gestionar jugar a perder y los trios*/
-	
-//NOT TESTED	
-puntuacionParejas(Puntuacion+Puntuacion2,Jugador):-
-	parejas(Lista1,Jugador) &
-	parejasTriosGanadoras(Lista2,Jugador) &
-	.length(Lista1,Puntuacion) &
-	.lengt(Lista2,Puntuacion2).
-	
-//Cada candidato de ganar siempre cuenta como +20
-//NOT TESTED
-puntuacionGanar(Puntuacion*20,Jugador):-
-	ganarSiempre(L,Jugador) &
-	.length(L,Puntuacion).
 
 	  	
 	
@@ -513,24 +549,6 @@ puntuacionGanar(Puntuacion*20,Jugador):-
 
 
 	
-	
-/* Por gestionar en la valoracion del tablero
-
-Posiciones en las que tienes un tres en raya con solo una libre: +20
-tresEnRayaVertical([pos(X,Y0)],J)
-tresEnRayaHorizontalIzquierda([pos(X0,Y)],J)
-tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J)
-tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J)
-tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J)
-tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J)
-tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J)
-/* Posiciones en las que hay tres en cuatro y una para ganar:  
-tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J)
-tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J)
-tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J)
-tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J)
-tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J)
-tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J)*/
 
 
 	
