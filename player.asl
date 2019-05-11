@@ -13,45 +13,48 @@
 
 mejorMovimiento(mov(-1,-1,-100000)). // El mejor movimiento a realizar
 profundidad(3). // La profundidad de búsqueda del árbol minmax
-
+jugador(1). // TEMPORAL
+oponente(2). // TEMPORAL
 /*----------------------------------------------------------------------------*/
 
-/* Calcula si un celda esta ocupada por el rival o fuera del tablero */
+/* Calcula si un celda esta ocupada por el rival o fuera del posicion */
 /* Falta implementar jugadorOponente(J) */
 ocupadoFueraDeTablero(X,Y,J):-
 	(X >= 0 & X <= 7) &
 	(Y >= 0 & Y <= 7) &
-	tablero(X,Y,jugadorOponente(J)).
+	posicion(X,Y,jugadorOponente(J)).
 
 
 // Comprueba si se puede colocar en una posición por encima de la fila siete 
-puedeColocar(X,Y-1):- //Tested 
+/*puedeColocar(X,Y-1):- //Tested 
 	(X >= 0 & X < 7) &
-	(tablero(X,Y,1) | tablero(X,Y,2)) &
-	tablero(X,Y-1,0) &
+	(posicion(X,Y,1) | posicion(X,Y,2)) &
+	posicion(X,Y-1,0) &
 	(Y >= 0 & Y < 7).
 
 puedeColocar(X,7):- //Tested
-	tablero(X,7,0).
+	posicion(X,7,0).*/
 
+
+puedeColocar(X,Y):- //Tested 
+	posicion(X,Y,0) &
+    (X >= 0 & X < 8) &
+    (Y >= 0 & Y < 8) &
+    (posicion(X,Y+1,1) | posicion(X,Y+1,2)).
+
+puedeColocar(X,7):- //Tested
+    posicion(X,7,0).
 
 /* Comprueba que aún se puede realizar movimientos */
 comprobarCeldasLibres:- //Tested
-	tablero(X,Y,0).
+	posicion(X,Y,0).
 
 /* Comprueba que aún hay celdas libres en una columna */
 comprobarCeldaLibreEnColumna(Columna,Fila):-
 	(Columna >= 0 & Columna < 8) &
 	puedeColocar(Columna,Fila).
 
-/* Comprueba si hay un belief de tmpTablero sino coge el percept */
-posicion(X,Y,J):-
-	tmpTablero(X,Y,J).
-
-posicion(X,Y,J):-
-	tablero(X,Y,J)[source(percept)].
-
-/* Comprueba si hay un cuatro en raya en el tablero */
+/* Comprueba si hay un cuatro en raya en el posicion */
 cuatroEnRayaVertical(J):- //Tested
 	posicion(X,Y,J) &
 	posicion(X,Y+1,J) &
@@ -140,67 +143,238 @@ nodosTerminales(Columna,Jugador,Estrategia,[mov(Columna,Fila,Puntos)|LMovimiento
 	.abolish(tmpTablero(Columna,Fila,J)) &
 	nodosTerminales(Columna+1,Jugador,Estrategia,LMovimientos).
 
+
 /* Para nodos terminales - Maximizar */
-minMax(Jugador,Profundidad,Puntos,Maximizar):-
+minMax(Jugador,Profundidad,Puntos,Maximizar):- //TESTED
+	.print("MAXIMIZAR -terminales- minMax") &
 	Profundidad = 0 & 
 	Maximizar &
+	.print("Terminales:",Profundidad) &
 	nodosTerminales(0,Jugador,Estrategia,LMovimientos) &
-	maximizarLista(mov(-1,-1,-5000),LMovimientos,Puntos).
+	maximizarLista(mov(-1,-1,-5000),LMovimientos,Puntos) &
+	.print("FIN MAXIMIZAR -terminales- minMax").
 
 /* Para nodos terminales - Minimizar */
-minMax(Jugador,Profundidad,Puntos,Maximizar):-
+minMax(Jugador,Profundidad,Puntos,Maximizar):- //TESTED
+	.print("MINIMIZAR -terminales- minMax") &
 	Profundidad = 0 & 
 	not Maximizar &
+	.print("Terminales:",Profundidad) &
 	nodosTerminales(0,Jugador,Estrategia,LMovimientos) &
-	maximizarLista(mov(-1,-1,5000),LMovimientos,Puntos).
+	maximizarLista(mov(-1,-1,5000),LMovimientos,Puntos) &
+	.print("FIN MINIMIZAR -terminales- minMax").
 
 /* Si gana o pierde devuelve ese movimiento */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
-	estrategia(Estrategia) &
+	Profundidad > 0 &
+	.print("GANAR O PERDER") &
 	evaluarTablero(Jugador,Estrategia,Puntos) &
-	(Puntos = 50 | Puntos = -50).
+	(Puntos = 50 | Puntos = -50) & 
+	.print("FIN GANAR O PERDER").
 
 /* En caso de empate */
 minMax(Jugador,Profundidad,0,Maximizar):-
-	estrategia(Estrategia)[source(self)] &
-	not comprobarCeldasLibres.
+	Profundidad > 0 &
+	.print("EMPATE minMax") &
+	//estrategia(Estrategia)[source(self)] &
+	not comprobarCeldasLibres &
+	.print("FIN EMPATE minMax").
 
 /* Turno de maximizar */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
-	estrategia(Estrategia)[source(self)] &
+	Profundidad > 0 &
+	.print("MAXIMIZAR minMax") &
+	//estrategia(Estrategia)[source(self)] &
 	Maximizar &
-	iterar(0,Profundidad-1,not true,LMovimientos) &
-	maximizarLista(LMovimientos,Puntos).
+	oponente(Jugador2) &
+	.print(Profundidad) &
+	iterar(0,Jugador2,Profundidad-1,not true,LMovimientos) &
+	maximizarLista(LMovimientos,Puntos) &
+	.print("FIN MAXIMIZAR minMax").
 
 /* Turno de minimizar */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
-	estrategia(Estrategia)[source(self)] &
+	Profundidad > 0 &
+	.print("MINIMIZAR minMax") &
+	//estrategia(Estrategia)[source(self)] &
 	not Maximizar &
-	iterar(0,Profundidad-1,true,LMovimientos) &
-	minimizarLista(LMovimientos,Puntos).
+	jugador(Jugador2) &
+	.print(Profundidad) &
+	iterar(0,Jugador2,Profundidad-1,true,LMovimientos) &
+	minimizarLista(LMovimientos,Puntos) &
+	.print("FIN MINIMIZAR minMax").
 
-
-/* Para cada movimiento */
-iterar(Columna,Profundidad,Maximizar,[Puntos|LMovimientos]):-
-	(Columna >= 0 & Columna < 8) &
-	comprobarCeldasLibres &
-	.asserta(tmpTablero(Columna,Fila,J)) &
-	minMax(Jugador,Profundidad,Puntos,Maximizar) &
-	.abolish(tmpTablero(Columna,Fila,J)) &
-	iterar(Columna+1,Profundidad,Maximizar,LMovimientos).
 
 /* Ya se recorrieron todas las posibilidades de movimientos */
-iterar(Columna,Profundidad,Maximizar,[]):-
+iterar(Columna,Jugador,Profundidad,Maximizar,[]):-
 	(Columna >= 8).
 
+/* Para cada movimiento */
+iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
+	(Columna >= 0 & Columna < 8) &
+	comprobarCeldasLibres &
+	comprobarCeldaLibreEnColumna(Columna,Fila) &
+	.asserta(tmpTablero(Columna,Fila,Jugador)) &
+	//tmpTablero(Columna,Fila,Jugador) &
+	//.print(Columna," - ",Fila," - ",Jugador) &
+	minMax(Jugador,Profundidad,Puntos,Maximizar) &
+	.abolish(tmpTablero(Columna,Fila,Jugador)) &
+	iterar(Columna+1,Jugador,Profundidad,Maximizar,LMovimientos).
 
-/* Devuelve los puntos de estado del tablero */
+
+/* Devuelve los puntos de estado del posicion */
 evaluarTablero(Jugador,Estrategia,5). // Falta implementar
 
+
+
+testing:-
+	.asserta(posicion(0,0,1)) &
+	.asserta(posicion(0,1,1)) &
+	.asserta(posicion(0,2,1)) &
+	.asserta(posicion(0,3,1)) &
+	.asserta(posicion(0,4,1)) &
+	.asserta(posicion(0,5,1)) &
+	.asserta(posicion(0,6,1)) &
+	.asserta(posicion(0,7,1)) &
+	.asserta(posicion(1,0,1)) &
+	.asserta(posicion(1,1,1)) &
+	.asserta(posicion(1,2,1)) &
+	.asserta(posicion(1,3,1)) &
+	.asserta(posicion(1,4,1)) &
+	.asserta(posicion(1,5,1)) &
+	.asserta(posicion(1,6,1)) &
+	.asserta(posicion(1,7,1)) &
+	.asserta(posicion(2,0,1)) &
+	.asserta(posicion(2,1,1)) &
+	.asserta(posicion(2,2,1)) &
+	.asserta(posicion(2,3,1)) &
+	.asserta(posicion(2,4,1)) &
+	.asserta(posicion(2,5,1)) &
+	.asserta(posicion(2,6,1)) &
+	.asserta(posicion(2,7,1)) &
+	.asserta(posicion(3,0,1)) &
+	.asserta(posicion(3,1,1)) &
+	.asserta(posicion(3,2,1)) &
+	.asserta(posicion(3,3,1)) &
+	.asserta(posicion(3,4,1)) &
+	.asserta(posicion(3,5,1)) &
+	.asserta(posicion(3,6,1)) &
+	.asserta(posicion(3,7,1)) &
+	.asserta(posicion(4,0,1)) &
+	.asserta(posicion(4,1,1)) &
+	.asserta(posicion(4,2,1)) &
+	.asserta(posicion(4,3,1)) &
+	.asserta(posicion(4,4,1)) &
+	.asserta(posicion(4,5,1)) &
+	.asserta(posicion(4,6,1)) &
+	.asserta(posicion(4,7,1)) &
+	.asserta(posicion(5,0,1)) &
+	.asserta(posicion(5,1,1)) &
+	.asserta(posicion(5,2,1)) &
+	.asserta(posicion(5,3,1)) &
+	.asserta(posicion(5,4,1)) &
+	.asserta(posicion(5,5,1)) &
+	.asserta(posicion(5,6,1)) &
+	.asserta(posicion(5,7,1)) &
+	.asserta(posicion(6,0,1)) &
+	.asserta(posicion(6,1,1)) &
+	.asserta(posicion(6,2,1)) &
+	.asserta(posicion(6,3,1)) &
+	.asserta(posicion(6,4,1)) &
+	.asserta(posicion(6,5,1)) &
+	.asserta(posicion(6,6,1)) &
+	.asserta(posicion(6,7,1)) &
+	.asserta(posicion(7,0,1)) &
+	.asserta(posicion(7,1,1)) &
+	.asserta(posicion(7,2,1)) &
+	.asserta(posicion(7,3,1)) &
+	.asserta(posicion(7,4,1)) &
+	.asserta(posicion(7,5,1)) &
+	.asserta(posicion(7,6,1)) &
+	.asserta(posicion(7,7,1)).
 /* INITIAL GOALS */
+//!encontrarMejorMovimiento(0,LMovimientos).
 /* PLANS */
+
+
+!copiarTablero(0,0).
+
+
+/*----------------------------------------------------------------------------*/
+/*-------------------------CREAR TABLERO TEMPORAL-----------------------------*/
+/*----------------------------------------------------------------------------*/
++!copiarTablero(Columna,Fila):
+	(Columna >= 0 & Columna < 8) &
+	(Fila >= 0 & Fila < 8) <-
+		?tablero(Columna,Fila,Jugador)[source(percept)];
+		.asserta(posicion(Columna,Fila,Jugador));
+		!copiarTablero(Columna,Fila+1).
+
++!copiarTablero(Columna,Fila):
+	(Columna >= 0 & Columna < 8) &
+	Fila = 8 <-
+		!copiarTablero(Columna+1,0).
+
++!copiarTablero(Columna,Fila):
+	Columna >= 8 <-
+		.print("Se ha generado el tablero temporal").//;
+		//!borrarTablero.
+/*----------------------------------------------------------------------------*/
+
+
+
+/*----------------------------------------------------------------------------*/
+/*-----------------------------BORRAR TABLERO---------------------------------*/
+/*----------------------------------------------------------------------------*/
++!borrarTablero <-
+	.abolish(posicion(_,_,_)).
+/*----------------------------------------------------------------------------*/
+
+
+
+/*----------------------------------------------------------------------------*/
+/*-----------------------ENCONTRAR MEJOR MOVIMIENTO---------------------------*/
+/*----------------------------------------------------------------------------*/
+
+// Si no hay celdas libres
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]:
+	not comprobarCeldasLibres[source(self)] <-
+		!finPartida.
+
+// Si no se puede colocar en la columna
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]: 
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	not comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] <-
+		!encontrarMejorMovimiento(Columna+1,LMovimientos).
+
+// Si se puede colocar ficha en la columna
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]:
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] &
+	jugador(Jugador)[source(self)] <-
+		.print("holiiiii");
+		+tmpTablero(Columna,Fila,Jugador);
+		.print("holiiiii2");
+		?minMax(Jugador,3,Puntos,not true);
+		.print("holiiiii3");
+		-tmpTablero(Columna,Fila,Jugador);
+		.print("holiiiii4");
+		!encontrarMejorMovimiento(Columna+1,[Puntos|LMovimientos]).
+
+// Si ya has comprobado todas las columnas
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]: 
+	Columna >= 8 <-
+		-mejorMovimiento(mov(Columna,Fila,Puntos));
+		put(Columna).
+
+/*----------------------------------------------------------------------------*/
 
 
 
 /*---------------------------------ERRORES------------------------------------*/
++!encontrarMejorMovimiento <- .print("Error en +!encontrarMejorMovimiento").
++!copiarTablero(_,_) <- .print("Error en +!copiarTablero").
++!borrarTablero(_,_) <- .print("Error en +!borrarTablero").
 /*----------------------------------------------------------------------------*/
