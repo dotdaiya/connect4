@@ -506,11 +506,57 @@ ganarSiempre([A,B,C],J):-
 	ganarSiempreDiagonalAlpha(B,J) &
 	ganarSiempreDiagonalBeta(C,J).
 
+/*Halla las jugadas comunes*/
+//NOT TESTED
+jugadasComunes(Jugador,Puntuacion):-
+		parejas(ListaParejas,Jugador) &
+		parejasTriosGanadoras(ListaParejasTrioGanan,Jugador) &
+		ganarSiempre(ListaGanaSiempre,Jugador) &
+		trios(ListaTrios,Jugador) &
+		triosGanan(ListaTriosGanan,Jugador) &
+		
+		busqueda(ListaParejas,ListaParejasTrioGanan,P1) &
+		busqueda(ListaParejas,ListaGanaSiempre,P2) &
+		busqueda(ListaParejas,ListaTrios,P3) &
+		busqueda(ListaParejas,ListaTriosGanan,P4) &
+ 
+		busqueda(ListaParejasTrioGanan,ListaGanaSiempre,P5) &
+		busqueda(ListaParejasTrioGanan,ListaTrios,P6) &
+		busqueda(ListaParejasTrioGanan,ListaTriosGanan,P7) &
+		
+		busqueda(ListaGanaSiempre,ListaTrios,P8) &
+		busqueda(ListaGanaSiempre,ListaTriosGanan,P9) &
+		
+		busqueda(ListaTrios,ListaTriosGanan,P10) &
+		
+		unoMismoComunes(ListaParejas,ListaParejas,P11) &
+		unoMismoComunes(ListaParejasTrioGanan,ListaParejasTrioGanan,P12) &
+		unoMismoComunes(ListaGanaSiempre,ListaGanaSiempre,P13) &
+		unoMismoComunes(ListaTrios,ListaTrios,P14) &
+		unoMismoComunes(ListaTriosGanan,ListaTriosGanan,P15) &
+		Puntuacion = P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9 + P10 + P11 + P12 + P13 + P14 + P15. 
+
 
 	  	
-	
-	
-	
+/*Dadas dos listas de posiciones obtiene los elementos comunes entre ellas*/
+/*
+	Casos base:
+		Lista vacía con una lista cualquiera 
+		Una lista cualquiera con una lista vacía
+	Lógica:
+		Dado un elemento recorre la lista en busca del numero de coincidencias
+		Si dos elementos coinciden entonces aumenta el resultado
+		si ningun elemento coincide avanza en la lista y mantiene el resultado
+*/
+busqueda([],Lista,0).
+busqueda([pos(X,Y)|Tail],Lista,Resultado+Resultado2):-comunes(pos(X,Y),Lista,Resultado) & busqueda(Tail,Lista,Resultado2).
+comunes(pos(_,_),[],0).
+comunes(pos(X,Y),[pos(X,Y)|Tail],Resultado):- comunes(pos(X,Y),Tail,Resultado+1). 
+comunes(pos(X,Y),[pos(_,_)|Tail],Resultado):- comunes(pos(X,Y),Tail,Resultado). 
+
+unoMismoComunes(_,[],0).
+unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(Y,X)|Tail2],Resultado):- comunes(Tail,Tail2,Resultado+1). 
+unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes(Tail,Tail2,Resultado). 
 	
 /* Initial goals */
 /* Plans */
