@@ -514,71 +514,111 @@ puntuacionTrios(Total,Jugador):-
 
 /*Halla las parejas disponibles en el tablero*/
 //NOT TESTED
-parejasHorizontales([A,B,C,D,E,F],J):-
+parejasHorizontales(Final,J):-
 	parejaHorizontalIzquierda(A,J) &
 	parejaHorizontalDerecha(B,J) &
 	parejaHorizontalCentral(C,J) &
 	parejaHorizontalSeparadaIzquierda(D,J) &
 	parejaHorizontalSeparadaIzquierda(E,J) &
-	parejaHorizontalSeparadaCentro(F,J).
+	parejaHorizontalSeparadaCentro(F,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(L,L2,L4) &
+	.concat(L4,L3,Final).
 	
 	
-parejasDiagonales([H,I,K,L,M,N,O,P,Q,R,S,T],J):-
-	parejaDiagonalAlphaIzquierda(H,J) &
-	parejaDiagonalAlphaDerecha(I,J) &
-	parejaDiagonalAlphaCentral(K,J) &
-	parejaDiagonalAlphaSeparadaIzq(L,J) &
-	parejaDiagonalAlphaSeparadaDer(M,J) &
-	parejaDiagonalAlphaSeparadaCentro(N,J) &
-	parejaDiagonalBetaIzquierda(O,J) &
-	parejaDiagonalBetaDerecha(P,J) &
-	parejaDiagonalBetaCentral(Q,J) &
-	parejaGeDiagonalBetaSeparadaIzq(R,J) &
-	parejaGeneraTrioDiagonalSeparadaDer(S,J) &
-	parejaDiagonalBetaSeparadaCentro(T,J).
+parejasDiagonales(Final,J):-
+	parejaDiagonalAlphaIzquierda(A,J) &
+	parejaDiagonalAlphaDerecha(B,J) &
+	parejaDiagonalAlphaCentral(C,J) &
+	parejaDiagonalAlphaSeparadaIzq(D,J) &
+	parejaDiagonalAlphaSeparadaDer(E,J) &
+	parejaDiagonalAlphaSeparadaCentro(F,J) &
+	parejaDiagonalBetaIzquierda(G,J) &
+	parejaDiagonalBetaDerecha(H,J) &
+	parejaDiagonalBetaCentral(I,J) &
+	parejaGeDiagonalBetaSeparadaIzq(K,J) &
+	parejaGeneraTrioDiagonalSeparadaDer(L,J) &
+	parejaDiagonalBetaSeparadaCentro(M,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(G,H,L4) &
+	.concat(I,K,L5) &
+	.concat(L,M,L6) &
+	.concat(L,L2,L7) &
+	.concat(L3,L4,L8) &
+	.concat(L5,L6,L9) &
+	.concat(L7,L8,L10) &
+	.concat(L9,L10,Final).
 	
 /* Halla las parejas que generan un trio que ganan siempre */
 //NOT TESTED
-parejasTriosGanadorasH([A,B,C],J):-
+parejasTriosGanadorasH(L,J):-
 	parejaGanadoraHorizontalDerecha(A,J) &
 	parejaGanadoraHorizontalIzquierda(B,J) &
-	parejaGanadoraHorizontalCentral(C,J).
-parejasTriosGanadorasD([D,E,F,G,H,I],J):-
-	parejaGanadoraDiagonalAlphaDerecha(D,J)&
-	parejaGanadoraDiagonalAlphaIzquierda(E,J) &
-	parejaGanadoraDiagonalAlphaCentral(F,J) &
-	parejaGanadoraDiagonalBetaIzquierda(G,J) &
-	parejaGanadoraDiagonalBetaDerecha(H,J) &
-	parejaGanadoraDiagonalBetaCentral(I,J).
+	parejaGanadoraHorizontalCentral(C,J) &
+	.concat(A,B,L) &
+	.concat(C,L,L2).
+	
+parejasTriosGanadorasD(Final,J):-
+	parejaGanadoraDiagonalAlphaDerecha(A,J)&
+	parejaGanadoraDiagonalAlphaIzquierda(B,J) &
+	parejaGanadoraDiagonalAlphaCentral(C,J) &
+	parejaGanadoraDiagonalBetaIzquierda(D,J) &
+	parejaGanadoraDiagonalBetaDerecha(E,J) &
+	parejaGanadoraDiagonalBetaCentral(F,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(L,L2,L4) &
+	.concat(L4,L3,Final).
 	
 /*Halla los trios en el tablero donde hay tres en cuatro y falta una para ganar*/
 //NOT TESTED
-trios([A,B,C,D,E,F],J):-
-	tresEnCuatroHorizontalCentroDerecha(A,J) &
-	tresEnCuatroHorizontalCentroIzquierda(B,J) &
-	tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
-	tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
-	tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
-	tresEnCuatroDiagonalBetaCentroIzquierda(F,J).
-	
+trios(Final,J):-
+    tresEnCuatroHorizontalCentroDerecha(A,J) &
+    tresEnCuatroHorizontalCentroIzquierda(B,J) &
+    tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
+    tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
+    tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
+    tresEnCuatroDiagonalBetaCentroIzquierda(F,J) & 
+    .concat(A,B,L) &
+    .concat(C,D,L2) &
+    .concat(E,F,L3) &
+    .concat(L,L2,L4) &
+    .concat(L4,L3,Final).
+
+
 /*Posiciones en las que tienes un tres en raya con solo una libre*/
 //NOT TESTED
-triosGananD([D,E,F,G],J):-	
-	tresEnRayaDiagonalAlphaDerechaAbajo(D,J) &
-	tresEnRayaDiagonalAlphaIzquierdaArriba(E,J) &
-	tresEnRayaDiagonalBetaDerechaArriba(F,J) &
-	tresEnRayaDiagonalBetaIzquierdaAbajo(G,J).
-triosGananH([B,C],J):-	
-	tresEnRayaHorizontalIzquierda(B,J) &
-	tresEnRayaHorizontalDerecha(C,J).
+triosGananD(Final,J):-
+    tresEnRayaDiagonalAlphaDerechaAbajo(A,J) &
+    tresEnRayaDiagonalAlphaIzquierdaArriba(B,J) &
+    tresEnRayaDiagonalBetaDerechaArriba(C,J) &
+    tresEnRayaDiagonalBetaIzquierdaAbajo(D,J) & 
+    .concat(A,B,L) &
+    .concat(C,D,L2) &
+    .concat(L,L2,L4) &
+    .concat(L4,L3,Final).
 
-	
+triosGananH(Final,J):-
+    tresEnRayaHorizontalIzquierda(A,J) &
+    tresEnRayaHorizontalDerecha(B,J) &
+    .concat(A,B,L) &
+    .concat(C,D,L2) &
+    .concat(L,L2,Final).
+
+
 /*Halla los trios que ganan siempre*/
 //NOT TESTED
-ganarSiempre([A,B,C],J):-
-	ganarSiempreHorizontal(A,J) &
-	ganarSiempreDiagonalAlpha(B,J) &
-	ganarSiempreDiagonalBeta(C,J).
+ganarSiempre(Final,J):-
+    ganarSiempreHorizontal(A,J) &
+    ganarSiempreDiagonalAlpha(B,J) &
+    ganarSiempreDiagonalBeta(C,J) &
+    .concat(A,B,L) &
+    .concat(C,L,Final).
 
 /*Halla las jugadas comunes*/
 //NOT TESTED
@@ -691,10 +731,7 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 /*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
 //NOT TESTED
 +!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
-	.put(X,Y-1).
-
-+!jugarAperderSegundo: estrategia(jugarAPerder) & tablero(X,Y,Rival) & tablero(X,Y-1,0) & quienSoy(Jugador,Rival) <-
-	.put(X,Y-1).
+	put(X).
 	
 
 
