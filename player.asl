@@ -23,13 +23,15 @@ ocupadoFueraDeTablero(X,Y,J):-
 
 
 /* Comprueba si se puede colocar en una posición por encima de la fila siete */
-puedeColocar(X,0).
+puedeColocar(X,Y1):- //Tested 
+    (X >= 0 & X < 8) &
+    Y = Y1 + 1 &
+     tablero(X,Y1,0) &
+    (tablero(X,Y,1) | tablero(X,Y,2))&
+    (Y >= 0 & Y < 8).
 
-puedeColocar(X,Y):-
-	(Y > 0) &
-	(tablero(X,Y-1,1) |
-	tablero(X,Y-1,2)).
-
+puedeColocar(X,7):- //Tested
+tablero(X,7,0).
 
 /* Posiciones en las que ganas siempre: +20 */
 ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-
@@ -304,10 +306,10 @@ parejaHorizontalSeparadaCentro([],J).
 
 /* Verticales */
 
-parejaVertical([pos(X0,Y)],J):-
-	tablero(X0,Y,0) &
-	tablero(X0,Y+1,J) &
-	tablero(X0,Y+2,J).
+parejaVertical([pos(X0,Y)],J):- //Funciona
+    tablero(X0,Y,0) & 
+    tablero(X0,Y+1,J) &
+    tablero(X0,Y+2,J).
 parejaVertical([],J).
 
 /* Diagonales Alpha */ 
@@ -456,13 +458,13 @@ y candidatos ganadores siempre y ponderando su valor*/
 
 /*Obtiene la puntuacion total del tablero*/
 //NOT TESTED
-puntuacionTotal(Puntuacion,Jugador,jugarAganar):-
+puntuacionTotal(Puntuacion,Jugador,"jugarAganar"):-
 	puntuacionParejas(P,Jugador) &
 	puntuacionGanarSiempre(Q,Jugador) &
 	puntuacionTrios(R,Jugador) &
-	puntuacionComunes(S,Jugador) &
-	Puntuacion = P+Q+R+S.
-puntuacionTotal(0,Jugador,jugarAganar).//Puntuacion por defecto si no encuentra parejas
+	jugadasComunes(S,Jugador) &
+	(Puntuacion = P+Q+R+S).
+//puntuacionTotal(0,Jugador,jugarAganar).//Puntuacion por defecto si no encuentra parejas
 
 /*Obtiene la puntuacion de las parejas encontradas
 
@@ -482,9 +484,9 @@ puntuacionParejas(Total,Jugador):-
 	.length(Lista1,Puntuacion) &
 	.length(Lista2,Puntuacion2) &
 	.length(Lista3,Puntuacion3) &
-	.length(Lista4,Puntuacio4) &
-	.length(Lista5,Puntuacio5) &
-	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacio4*20 + Puntuacion5*10.
+	.length(Lista4,Puntuacion4) &
+	.length(Lista5,Puntuacion5) &
+	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacion4*20 + Puntuacion5*10.
 	
 /*Obtiene la puntuacion de los candidatos a ganar siempre 90/100 */
 //NOT TESTED
@@ -504,12 +506,12 @@ puntuacionTrios(Total,Jugador):-
 	trios(Lista1,Jugador) &
 	triosGananH(Lista2,Jugador) &
 	triosGananD(Lista3,Jugador) &
-	tresEnRayaVertical(Lista4,J) &
+	tresEnRayaVertical(Lista4,Jugador) &
 	.length(Lista1,Puntuacion)&
 	.length(Lista2,Puntuacion2)&
 	.length(Lista3,Puntuacion3)&
 	.length(Lista4,Puntuacion4)&
-	Total = Puntuacion*85 + Puntuacion2*75 + Puntuacion3*70 + Puntuacion4*60.
+	Total = Puntuacion*85 + Puntuacion3*75 + Puntuacion2*70 + Puntuacion4*60.
 	  
 
 /*Halla las parejas disponibles en el tablero*/
@@ -600,15 +602,12 @@ triosGananD(Final,J):-
     tresEnRayaDiagonalBetaIzquierdaAbajo(D,J) & 
     .concat(A,B,L) &
     .concat(C,D,L2) &
-    .concat(L,L2,L4) &
-    .concat(L4,L3,Final).
+    .concat(L,L2,Final).
 
 triosGananH(Final,J):-
     tresEnRayaHorizontalIzquierda(A,J) &
     tresEnRayaHorizontalDerecha(B,J) &
-    .concat(A,B,L) &
-    .concat(C,D,L2) &
-    .concat(L,L2,Final).
+    .concat(A,B,Final).
 
 
 /*Halla los trios que ganan siempre*/
