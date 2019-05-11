@@ -727,6 +727,14 @@ unoMismoComunes([pos(X,Y) | Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):- comunes
 		?calcularMovimientos(LMovimientos).
 		
 
+/*Define elementos iniciales tales como el primer turno*/
++!definiciones[source(self)]: turno(X) & .my_name(X) <- 
+		+primerTurno("primero");
+		!jugar.
++!definiciones[source(self)]: turno(X) & not .my_name(X) <- 
+		+primerTurno("segundo");
+		!jugar.
+		
 /*Gestiona el cambio de turno en función del nombre del agente*/
 /*Gestiona la partida cuando juega a ganar y empieza primero*/
 +!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAganar) & primerTurno("primero")<- .print("hi").
