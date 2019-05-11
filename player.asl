@@ -21,12 +21,12 @@ ocupadoFueraDeTablero(X,Y,J):-
 
 
 /* Comprueba si se puede colocar en una posiciÃ³n por encima de la fila siete */
-
-puedeColocar(X,Y-1):- //Tested 
-    (X >= 0 & X < 7) &
-    (tablero(X,Y,1) | tablero(X,Y,2)) &
-    tablero(X,Y-1,0) &
-    (Y >= 0 & Y < 7).
+puedeColocar(X,Y1):- //Tested 
+    (X >= 0 & X < 8) &
+    Y = Y1 + 1 &
+     tablero(X,Y1,0) &
+    (tablero(X,Y,1) | tablero(X,Y,2))&
+    (Y >= 0 & Y < 8).
 
 puedeColocar(X,7):- //Tested
     tablero(X,7,0).
@@ -368,15 +368,15 @@ parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):- //Funciona
 /* Diagonales Beta */
 
 /* Puntuación : */	
-parejaDiagonalBetaDerecha([pos(X0+2,Y0+2)],J):- //Falla
+parejaDiagonalBetaDerecha([pos(X0-2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,J) &
-	tablero(X0+1,Y0+1,J) &
-	tablero(X0+2,Y0+2,0) &
-	tablero(X0+3,Y0+3,0) &
-	puedeColocar(X0+2,Y0+2).
+	tablero(X0-1,Y0+1,J) &
+	tablero(X0-2,Y0+2,0) &
+	tablero(X0-3,Y0+3,0) &
+	puedeColocar(X0-2,Y0+2).
 	
 /* Puntuación : */	
-parejaDiagonalBetaIzquierda([pos(X0+1,Y0+1)],J):- //Falla
+parejaDiagonalBetaIzquierda([pos(X0+1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
@@ -384,15 +384,15 @@ parejaDiagonalBetaIzquierda([pos(X0+1,Y0+1)],J):- //Falla
 	puedeColocar(X0-1,Y0+1).
 	
 /* Puntuación : */	
-parejaDiagonalBetaCentral([pos(X0,Y0)],J):- //Falla
+parejaDiagonalBetaCentral([pos(X0-3,Y0+3)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,J) &
 	tablero(X0-3,Y0+3,0) &
-	puedeColocar(X0,Y0).
+	puedeColocar(X0-3,Y0+3).
 	
 /* Puntuación : */	
-parejaDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):- //Falla
+parejaDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):- //Funciona
 	tablero(X0,Y0,J) &
 	tablero(X0-1,Y0+1,0) &
 	tablero(X0-2,Y0+2,J) &
@@ -400,7 +400,7 @@ parejaDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):- //Falla
 	puedeColocar(X0-1,Y0+1).
 	
 /* Puntuación : */	
-parejaDiagonalBetaSeparadaDer([pos(X0-2,Y0+2)],J):- //Falla
+parejaDiagonalBetaSeparadaDer([pos(X0-2,Y0+2)],J):- //Funciona
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0+1,J) &
 	tablero(X0-2,Y0+2,0) &
@@ -414,49 +414,107 @@ parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):- //Funciona
 	tablero(X0-2,Y0+2,0) &
 	tablero(X0-3,Y0+3,J) &
 	puedeColocar(X0-1,Y0+1).
-
-/* Posiciones iniciales */
-
-/* Puntuación : */	
-solitaGeneraTodas([pos(X0,Y0)]):-
-	solitaGeneraHorizontal([pos(X0,Y0)])&
-	solitaGeneraVertical([pos(X0,Y0)])&
-	solitaGeneraDiagonalAlpha([pos(X0,Y0)])&
-	solitaGeneraDiagonalBeta([pos(X0,Y0)]).
-/* Puntuación : */	
-solitaGeneraTres([pos(X0,Y0)]):-
-	solitaGeneraHorizontal([pos(X0,Y0)])&
-	solitaGeneraVertical([pos(X0,Y0)])&
-	(solitaGeneraDiagonalAlpha([pos(X0,Y0)]) | solitaGeneraDiagonalBeta([pos(X0,Y0)])).
-/* Puntuación : */	
-solitaGeneraUna([pos(X0,Y0)]):-
-	(solitaGeneraHorizontal([pos(X0,Y0)]) |
-	solitaGeneraVertical([pos(X0,Y0)]) |
-	solitaGeneraDiagonalAlpha([pos(X0,Y0)]) |
-	solitaGeneraDiagonalBeta([pos(X0,Y0)])).
 	
-solitaGeneraHorizontal([pos(X0,Y0)]):-
+/* Segundo Movimiento */
+
+/* Puntuación : */
+solitaGeneraTres([pos(X0,Y0)],J):-
+    solitaGeneraHorizontal([pos(X0,Y0)],J) &
+    solitaGeneraVertical([pos(X1,Y1)],J) &
+   	((X1=X0-1) & (Y1=Y0-1)) &
+    solitaGeneraDiagonalAlpha([pos(X2,Y2)],J) &
+   	((X2=X0-2) & (Y2=Y0-1)).
+
+solitaGeneraTres([pos(X0,Y0)],J):-
+      solitaGeneraHorizontal([pos(X0,Y0)],J) &
+    solitaGeneraVertical([pos(X1,Y1)],J) &
+   	((X1=X0+1) & (Y1=Y0-1)) &
+    solitaGeneraDiagonalBeta([pos(X2,Y2)],J) &
+   	((X2=X0+2) & (Y2=Y0-1)).
+	
+/* Puntuación : */	
+
+solitaGeneraUna([pos(X0,Y0)],J):-
+	(solitaGeneraHorizontal([pos(X0,Y0)],J) |
+	solitaGeneraVertical([pos(X0,Y0)],J) |
+	solitaGeneraDiagonalAlpha([pos(X0,Y0)],J) |
+	solitaGeneraDiagonalBeta([pos(X0,Y0)],J)).
+
+solitaGeneraHorizontal([pos(X0+1,Y0)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0,0) & 
+	tablero(X0+2,Y0,0) &
+	tablero(X0+3,Y0,0) &
+	puedeColocar(X0+1,Y0).
+
+solitaGeneraVertical([pos(X0,Y0-1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0,Y0-1,0) & 
+	tablero(X0,Y0-2,0) &
+	tablero(X0,Y0-3,0) &
+	puedeColocar(X0,Y0-1).
+	
+solitaGeneraDiagonalAlpha([pos(X0-1,Y0-1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0-1,Y0-1,0) & 
+	tablero(X0-2,Y0-2,0) &
+	tablero(X0-3,Y0-3,0) &
+	puedeColocar(X0-1,Y0-1).
+	
+solitaGeneraDiagonalBeta([pos(X0+1,Y0-1)],J):-
+	tablero(X0,Y0,J) &
+	tablero(X0+1,Y0-1,0) & 
+	tablero(X0+2,Y0-2,0) &
+	tablero(X0+3,Y0-3,0) &
+	puedeColocar(X0+1,Y0-1).	
+
+/* Primer movimiento */
+
+/* Puntuación : */	
+
+primeraGeneraTodas([pos(X0,Y0)]):-
+	primeraGeneraHorizontal([pos(X0,Y0)])&
+	primeraGeneraVertical([pos(X0,Y0)])&
+	primeraGeneraDiagonalAlpha([pos(X0,Y0)])&
+	primeraGeneraDiagonalBeta([pos(X0,Y0)]).
+	
+/* Puntuación : */	
+
+primeraGeneraTres([pos(X0,Y0)]):-
+	primeraGeneraHorizontal([pos(X0,Y0)])&
+	primeraGeneraVertical([pos(X0,Y0)])&
+	(primeraGeneraDiagonalAlpha([pos(X0,Y0)]) | primeraGeneraDiagonalBeta([pos(X0,Y0)])).
+
+/* Puntuación : */	
+
+primeraGeneraUna([pos(X0,Y0)]):-
+	(primeraGeneraHorizontal([pos(X0,Y0)]) |
+	primeraGeneraVertical([pos(X0,Y0)]) |
+	primeraGeneraDiagonalAlpha([pos(X0,Y0)]) |
+	primeraGeneraDiagonalBeta([pos(X0,Y0)])).
+	
+primeraGeneraHorizontal([pos(X0,Y0)]):-
 	puedeColocar(X0,Y0)&
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0,0) & 
 	tablero(X0+2,Y0,0) &
 	tablero(X0+3,Y0,0).
 
-solitaGeneraVertical([pos(X0,Y0)]):-
+primeraGeneraVertical([pos(X0,Y0)]):-
 	tablero(X0,Y0,0) &
 	tablero(X0,Y0-1,0) & 
 	tablero(X0,Y0-2,0) &
 	tablero(X0,Y0-3,0) &
 	puedeColocar(X0,Y0).
 	
-solitaGeneraDiagonalAlpha([pos(X0,Y0)]):-
+primeraGeneraDiagonalAlpha([pos(X0,Y0)]):-
 	tablero(X0,Y0,0) &
 	tablero(X0-1,Y0-1,0) & 
 	tablero(X0-2,Y0-2,0) &
 	tablero(X0-3,Y0-3,0) &
 	puedeColocar(X0,Y0).
 	
-solitaGeneraDiagonalBeta([pos(X0,Y0)]):-
+primeraGeneraDiagonalBeta([pos(X0,Y0)]):-
 	tablero(X0,Y0,0) &
 	tablero(X0+1,Y0-1,0) & 
 	tablero(X0+2,Y0-2,0) &
