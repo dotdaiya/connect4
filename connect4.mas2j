@@ -31,8 +31,12 @@ MAS connect4 {
 	environment: Blackboard 
 
     agents:
+		
+		//player;
+		
+		player1 player;
 
-        player;
+        player2 player;
 
 }
 
