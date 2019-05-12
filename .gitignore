@@ -11,3 +11,6 @@ CustomView.java
 CustomModel.java
 *.png
 *.gif
+
+# Unknown files
+.stop___MAS
