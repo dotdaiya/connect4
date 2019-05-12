@@ -694,94 +694,35 @@ unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
 +!definiciones[source(self)]<- 
 		.wait(50); 
 		!definiciones.
+		
+/*Gestiona el cambio de turno en función del nombre del agente*/
+/*Gestiona la partida cuando juega a ganar */
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player1) & estrategia(jugarAGanar)[source(percept)] <- .print("hi").
++!jugar[source(self)]: turno(X) & .my_name(X) & (X = player2) & estrategia(jugarAGanar)[source(percept)] <- .print("hi").
 
 
-/*Gestiona la partida cuando juega a ganar y empieza primero*/
-+!jugar[source(self)]:
-	turno(X) &
-	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("primero") <-
-		.print("hi").
+/*Gestiona la partida cuando juega a perder comenzando primero*/
++!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player1) & 
+	estrategia(jugarAPerder)[source(percept)]  & primerTurno("primero")[source(self)] <- .print("hi").
++!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player2) & 
+	estrategia(jugarAPerder)[source(percept)]  & primerTurno("primero")[source(self)] <- .print("hi").
 
-+!jugar[source(self)]:
-	turno(X) &
-	.my_name(X) &
-	(X = player2) &
-	estrategia(jugarAGanar) &
-	primerTurno("primero") <-
-		.print("hi").
-
-
-/*Gestiona la partida cuando juega a ganar y empieza segundo*/
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		.print("hi").
-
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player2) & 
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		.print("hi").
-
-/* Gestiona la partida cuando juega a perder y empieza primero */
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player1) & 
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("primero")[source(self)] <-
-		.print("hi").
-
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player2) & 
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("primero")[source(self)] <-
-		.print("hi").
-
-/* Gestiona la partida cuando juega a perder y empieza segundo */
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		!jugarAperderSegundo.
-
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player2) &
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		!jugarAperderSegundo.
-
-/* Si es el turno del oponente no hace nada */
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(Y) &
-	not (X = Y) <- 
-		.wait(50);
-		!jugar. 
-
-/*	Busca la primera ficha del rival que no tenga una ficha del jugador colocada
-	encima y coloca su ficha encima de la del rival */		
-+!jugarAperderSegundo[source(self)]:
-	quienSoy(Jugador,Rival) &
-	posicion(X,Y,Rival) &
-	posicion(X,Y-1,0) <-
-		put(X);
-		!jugar.
+/*Gestiona la partida cuando es un caso particular*/
++!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player1) & 
+	estrategia(jugarAPerder)[source(percept)] & primerTurno("segundo")[source(self)]<- !jugarAperderSegundo.
++!jugar[source(self)]: turno(X)[source(percept)] & .my_name(X) & (X = player2) & 
+	estrategia(jugarAPerder)[source(percept)] & primerTurno("segundo")[source(self)]<- !jugarAperderSegundo.
 	
+/*Si es el turno del oponente no hace nada*/
++!jugar[source(self)]: turno(X)[source(percept)] & .my_name(Y) & not (X = Y)<- 
+		.wait(50);
+		!jugar. 	
+		
+		
+/*Busca la primera ficha del rival que no tenga una ficha del jugador colocada encima y coloca su ficha encima de la del rival*/		
++!jugarAperderSegundo[source(self)]:quienSoy(Jugador,Rival) & tablero(X,Y,Rival) & tablero(X,Y-1,0) <-
+	put(X);
+	!jugar.
 
 
 
