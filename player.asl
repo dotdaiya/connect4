@@ -9,10 +9,6 @@
 
 /* BELIEFS AND RULES */
 /*----------------------------BELIEFS INICIALES-------------------------------*/
-mejorMovimiento(mov(-1,-1,-100000)). // El mejor movimiento a realizar
-profundidad(3). // La profundidad de búsqueda del árbol minmax
-movimientoMaximizado(-1,-1,-500).
-movimientoMinimizado(-1,-1,500).
 /*----------------------------------------------------------------------------*/
 
 
@@ -28,7 +24,7 @@ nadieGano:- //Tested
 	not cuatroEnRayaDiagonalBeta(2).
 
 
-/*  Define quien es el jugador y quien es el rival de forma numerica en funcion 
+/*  Define quien es el jugador y quien[source(self)] es el rival de forma numerica en funcion 
 	del nombre, queda comprobado que el posicion solo reconoce a los agentes con
 	el nombre indicado */
 quienSoy(1,2):-
@@ -38,17 +34,17 @@ quienSoy(2,1):-
 
 /* Comprueba si se puede colocar en una posición por encima de la fila siete */ 
 puedeColocar(X,Y):- //Tested 
-	posicion(X,Y,0) &
+	posicion(X,Y,0)[source(self)] &
     (X >= 0 & X < 8) &
     (Y >= 0 & Y < 8) &
-    (posicion(X,Y+1,1) | posicion(X,Y+1,2)).
+    (posicion(X,Y+1,1)[source(self)] | posicion(X,Y+1,2)[source(self)]).
 puedeColocar(X,7):- //Tested
-    posicion(X,7,0).
+    posicion(X,7,0)[source(self)].
 
 
 /* Comprueba que aún se puede realizar movimientos */
 comprobarCeldasLibres:- //Tested
-	posicion(X,Y,0).
+	posicion(X,Y,0)[source(self)].
 
 
 /* Comprueba que aún hay celdas libres en una columna */
@@ -60,143 +56,125 @@ comprobarCeldaLibreEnColumna(Columna,Fila):-
 /*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
 /* Obtener las puntuaciones del posicion contando el numero de trios, parejas 
 y candidatos ganadores siempre y ponderando su valor */
-
-/* Obtiene la puntuacion total del posicion */
-evaluarTablero(J,jugarAGanar,50):-// Cuatro en raya
-	jugador(J) &
-	ganarSiempre(Elem,J) &
-	cuatroEnRaya(J).
-evaluarTablero(J,jugarAGanar,-50):-// Cuatro en raya
-	oponente(J) &
-	cuatroEnRaya(J).
-evaluarTablero(J,jugarAPerder,-50):-// Cuatro en raya
-	jugador(J) &
-	ganarSiempre(Elem,J) &
-	cuatroEnRaya(J).
-evaluarTablero(J,jugarAPerder,50):-// Cuatro en raya
-	oponente(J) &
-	ganarSiempre(Elem,J) &
-	cuatroEnRaya(J).
-
 evaluarTablero(J,jugarAGanar,45):-// Tres en raya ganar siempre
-	jugador(J) &
+	jugador(J)[source(self)] &
 	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
-	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	//.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAGanar,-45):-// Tres en raya ganar siempre
-	oponente(J) &
+	oponente(J)[source(self)] &
 	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
-	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	//.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAPerder,-45):-// Tres en raya ganar siempre
-	jugador(J) &
+	jugador(J)[source(self)] &
 	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
-	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	//.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAPerder,45):-// Tres en raya ganar siempre
-	oponente(J) &
+	oponente(J)[source(self)] &
 	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
-	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	//.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
 
 evaluarTablero(J,jugarAGanar,45):-// >1 trio
-	jugador(J) &
+	jugador(J)[source(self)] &
 	trios(Elem,J) &
 	.length(Elem,X) &
-	.print(">1trio-Length: ", X) & 
+	//.print(">1trio-Length: ", X) & 
 	X > 1.
 evaluarTablero(J,jugarAGanar,-45):-// >1 trio
-	oponente(J) &
+	oponente(J)[source(self)] &
 	trios(Elem,J) &
 	.length(Elem,X) &
-	.print(">1trio-Length: ", X) & 
+	//.print(">1trio-Length: ", X) & 
 	X > 1.
 evaluarTablero(J,jugarAPerder,-45):-// >1 trio
-	jugador(J) &
+	jugador(J)[source(self)] &
 	trios(Elem,J) &
 	.length(Elem,X) &
-	.print(">1trio-Length: ", X) & 
+	//.print(">1trio-Length: ", X) & 
 	X > 1.
 evaluarTablero(J,jugarAPerder,45):-// >1 trio
-	oponente(J) &
+	oponente(J)[source(self)] &
 	trios(Elem,J) &
 	.length(Elem,X) &
-	.print(">1trio-Length: ", X) & 
+	//.print(">1trio-Length: ", X) & 
 	X > 1.
 
 evaluarTablero(J,jugarAGanar,35):-// Un solo trio
-	jugador(J) &
+	jugador(J)[source(self)] &
 	trios(Elem,J) &
-	.print("1trio") & 
+	//.print("1trio") & 
 	.length(Elem,1).
 evaluarTablero(J,jugarAGanar,-35):-// Un solo trio
-	oponente(J) &
+	oponente(J)[source(self)] &
 	trios(Elem,J) &
-	.print("1trio") & 
+	//.print("1trio") & 
 	.length(Elem,1).
 evaluarTablero(J,jugarAPerder,-35):-// Un solo trio
-	jugador(J) &
+	jugador(J)[source(self)] &
 	trios(Elem,J) &
-	.print("1trio") & 
+	//.print("1trio") & 
 	.length(Elem,1).
 evaluarTablero(J,jugarAPerder,35):-// Un solo trio
-	oponente(J) &
+	oponente(J)[source(self)] &
 	trios(Elem,J) &
-	.print("1trio") & 
+	//.print("1trio") & 
 	.length(Elem,1).
 
 evaluarTablero(J,jugarAGanar,30+X):-// Una pareja ganadora
-	jugador(J) &
+	jugador(J)[source(self)] &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
-	.print("parejaGanadora-Length: ", X) &
+	//.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAGanar,-30-X):-// Una pareja ganadora
-	oponente(J) &
+	oponente(J)[source(self)] &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
-	.print("parejaGanadora-Length: ", X) &
+	//.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAPerder,-30-X):-// Una pareja ganadora
-	jugador(J) &
+	jugador(J)[source(self)] &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
-	.print("parejaGanadora-Length: ", X) &
+	//.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
 evaluarTablero(J,jugarAPerder,30+X):-// Una pareja ganadora
-	oponente(J) &
+	oponente(J)[source(self)] &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
-	.print("parejaGanadora-Length: ", X) &
+	//.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
 
 evaluarTablero(J,jugarAGanar,10+X):-// Jugadas comunes con parejas
-	jugador(J) &
+	jugador(J)[source(self)] &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
-	.print("jugadasComunes-Length: ", X) &
+	//.print("jugadasComunes-Length: ", X) &
 	X >= 1.
 evaluarTablero(J,jugarAGanar,-10-X):-// Jugadas comunes con parejas
-	oponente(J) &
+	oponente(J)[source(self)] &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
-	.print("jugadasComunes-Length: ", X) &
+	//.print("jugadasComunes-Length: ", X) &
 	X >= 1.
 evaluarTablero(J,jugarAPerder,-10-X):-// Jugadas comunes con parejas
-	jugador(J) &
+	jugador(J)[source(self)] &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
-	.print("jugadasComunes-Length: ", X) &
+	//.print("jugadasComunes-Length: ", X) &
 	X >= 1.
 evaluarTablero(J,jugarAPerder,10+X):-// Jugadas comunes con parejas
-	oponente(J) &
+	oponente(J)[source(self)] &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
-	.print("jugadasComunes-Length: ", X) &
+	//.print("jugadasComunes-Length: ", X) &
 	X >= 1.
 
 
@@ -210,55 +188,55 @@ evaluarTablero(J,jugarAPerder,10+X):-// Jugadas comunes con parejas
 	*/		
 
 evaluarTablero(J,jugarAGanar,9):-// Tres solas
-	jugador(J) &
-	solitaGeneraTres(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraTres(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAGanar,-9):-// Tres solas
-	oponente(J) &
-	solitaGeneraTres(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraTres(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,-9):-// Tres solas
-	jugador(J) &
-	solitaGeneraTres(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraTres(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,9):-// Tres solas
-	oponente(J) &
-	solitaGeneraTres(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraTres(Elem,J).
+	//.print("jugadasComunes").
 
 evaluarTablero(J,jugarAGanar,7):-// Dos solas
-	jugador(J) &
-	solitaGeneraDos(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraDos(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAGanar,-7):-// Dos solas
-	oponente(J) &
-	solitaGeneraDos(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraDos(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,-7):-// Dos solas
-	jugador(J) &
-	solitaGeneraDos(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraDos(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,7):-// Dos solas
-	oponente(J) &
-	solitaGeneraDos(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraDos(Elem,J).
+	//.print("jugadasComunes").
 
 evaluarTablero(J,jugarAGanar,4):-// Una sola
-	jugador(J) &
-	solitaGeneraUna(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraUna(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAGanar,-4):-// Una sola
-	oponente(J) &
-	solitaGeneraUna(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraUna(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,-4):-// Una sola
-	jugador(J) &
-	solitaGeneraUna(Elem,J) &
-	.print("jugadasComunes").
+	jugador(J)[source(self)] &
+	solitaGeneraUna(Elem,J).
+	//.print("jugadasComunes").
 evaluarTablero(J,jugarAPerder,4):-// Una sola
-	oponente(J) &
-	solitaGeneraUna(Elem,J) &
-	.print("jugadasComunes").
+	oponente(J)[source(self)] &
+	solitaGeneraUna(Elem,J).
+	//.print("jugadasComunes").
 
 evaluarTablero(_,_,0).// Predeterminado
 	/*Obtiene la puntuacion de las parejas encontradas
@@ -418,7 +396,7 @@ jugadasComunes(I2,J):-
 		parejaVertical(ParejasV,J) & 
 		.union(ParejasH,ParejasD,A0) &
 		.union(A0,ParejasV,A1) &
-		.union(A1,ParejasGanadora,A2).
+		.union(A1,ParejasD,A2).
 
 
 
@@ -449,51 +427,56 @@ maximizarLista(Puntos0,[Puntos1|Tail],Puntos):-
 
 
 /* Si gana devuelve 50 jugar a ganar*/
-minMax(Jugador,Profundidad,50,Maximizar):-
+minMax(_,Profundidad,50,Maximizar):-
 	//.print("GANAR") &
 	estrategia(jugarAGanar)[source(percept)] &
+	jugador(Jugador)[source(self)] &
 	cuatroEnRaya(Jugador).
 	//.print("FIN GANAR").
 /* Si pierde devuelve -50 jugar a ganar*/
-minMax(Jugador,Profundidad,-50,Maximizar):-
+minMax(_,Profundidad,-50,Maximizar):-
 	//.print("GANAR") &
 	estrategia(jugarAGanar)[source(percept)] &
-	oponente(O) &
+	oponente(O)[source(self)] &
 	cuatroEnRaya(O).
 	//.print("FIN GANAR").
 /* Si gana devuelve -50 jugar a perder*/
-minMax(Jugador,Profundidad,-50,Maximizar):-
+minMax(_,Profundidad,-50,Maximizar):-
 	//.print("GANAR") &
 	estrategia(jugarAPerder)[source(percept)] &
+	jugador(Jugador)[source(self)] &
 	cuatroEnRaya(Jugador).
 	//.print("FIN GANAR").
 /* Si pierde devuelve 50 jugar a perder*/
-minMax(Jugador,Profundidad,50,Maximizar):-
+minMax(_,Profundidad,50,Maximizar):-
 	//.print("GANAR") &
 	estrategia(jugarAPerder)[source(percept)] &
-	oponente(O) &
+	oponente(O)[source(self)] &
 	cuatroEnRaya(O).
 	//.print("FIN GANAR").
 /* En caso de empate*/
-minMax(Jugador,Profundidad,0,Maximizar):-
+minMax(_,Profundidad,0,Maximizar):-
 	//.print("EMPATE minMax") &
 	not comprobarCeldasLibres &
 	nadieGano.
 	//.print("FIN EMPATE minMax").
 /* Caso base */
-minMax(Jugador,0,Puntos,Maximizar):-
+minMax(_,0,Puntos1+Puntos2,Maximizar):-
 	//.print("Caso base") &
+	jugador(Jugador)[source(self)] &
+	oponente(Oponente)[source(self)] &
 	estrategia(Estrategia)[source(percept)] &
-	evaluarTablero(Jugador,Estrategia,Puntos).
+	evaluarTablero(Jugador,Estrategia,Puntos1) &
+	evaluarTablero(Oponente,Estrategia,Puntos2).
 	//.print("FIN Caso base").
 /* Turno de maximizar */
-minMax(Jugador,Profundidad,Puntos,Maximizar):-
+minMax(_,Profundidad,Puntos,Maximizar):-
 	Profundidad > 0 &
 	//.print("MAXIMIZAR minMax") &
 	Maximizar &
-	oponente(Jugador2) &
+	oponente(Jugador[source(self)]) &
 	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","not true",")") &
-	iterar(0,Jugador2,Profundidad-1,not true,LMovimientos) &
+	iterar(0,Jugador,Profundidad-1,not true,LMovimientos) &
 	maximizarLista(-500,LMovimientos,Puntos).
 	//.print("FIN MAXIMIZAR minMax").
 /* Turno de minimizar */
@@ -501,9 +484,9 @@ minMax(Jugador,Profundidad,Puntos,Maximizar):-
 	Profundidad > 0 &
 	//.print("MINIMIZAR minMax") &
 	not Maximizar &
-	jugador(Jugador2) &
+	jugador(Jugador)[source(self)] &
 	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","true",")") &
-	iterar(0,Jugador2,Profundidad-1,true,LMovimientos) &
+	iterar(0,Jugador,Profundidad-1,true,LMovimientos) &
 	minimizarLista(500,LMovimientos,Puntos).
 	//.print("FIN MINIMIZAR minMax").
 
@@ -522,7 +505,7 @@ iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
 	(Columna >= 0 & Columna < 8) &
 	comprobarCeldasLibres &
 	comprobarCeldaLibreEnColumna(Columna,Fila) &
-	posicion(Columna,Fila,W) &
+	posicion(Columna,Fila,W)[source(self)] &
 	.abolish(posicion(Columna,Fila,W)) &
 	.asserta(posicion(Columna,Fila,Jugador)) &
 	minMax(Jugador,Profundidad,Puntos,Maximizar) &
@@ -536,54 +519,54 @@ iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
 /*------------------------PATRONES DEL TABLERO--------------------------------*/
 /* Comprueba si hay un cuatro en raya en el posicion */
 cuatroEnRayaVertical(J):-
-	posicion(X,Y,J) &
-	posicion(X,Y+1,J) &
-	posicion(X,Y+2,J) &
-	posicion(X,Y+3,J).
+	posicion(X,Y,J)[source(self)] &
+	posicion(X,Y+1,J)[source(self)] &
+	posicion(X,Y+2,J)[source(self)] &
+	posicion(X,Y+3,J)[source(self)].
 cuatroEnRayaHorizontal(J):-
-	posicion(X,Y,J) &
-	posicion(X+1,Y,J) &
-	posicion(X+2,Y,J) &
-	posicion(X+3,Y,J).
+	posicion(X,Y,J)[source(self)] &
+	posicion(X+1,Y,J)[source(self)] &
+	posicion(X+2,Y,J)[source(self)] &
+	posicion(X+3,Y,J)[source(self)].
 cuatroEnRayaDiagonalAlpha(J):-
-	posicion(X,Y,J) &
-	posicion(X+1,Y+1,J) &
-	posicion(X+2,Y+2,J) &
-	posicion(X+3,Y+3,J).
+	posicion(X,Y,J)[source(self)] &
+	posicion(X+1,Y+1,J)[source(self)] &
+	posicion(X+2,Y+2,J)[source(self)] &
+	posicion(X+3,Y+3,J)[source(self)].
 cuatroEnRayaDiagonalBeta(J):-
-	posicion(X,Y,J) &
-	posicion(X-1,Y+1,J) &
-	posicion(X-2,Y+2,J) &
-	posicion(X-3,Y+3,J).
+	posicion(X,Y,J)[source(self)] &
+	posicion(X-1,Y+1,J)[source(self)] &
+	posicion(X-2,Y+2,J)[source(self)] &
+	posicion(X-3,Y+3,J)[source(self)].
 
 
 /* Posiciones en las que ganas siempre: +20 */
 ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-//TESTED
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,J) &
-	posicion(X0+4,Y,0) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
+	posicion(X0+4,Y,0)[source(self)] &
 	puedeColocar(X0,Y) &
 	puedeColocar(X0+4,Y).
 ganarSiempreHorizontal([],J).
 
 ganarSiempreDiagonalAlpha([pos(X0,Y0),pos(X0+4,Y0+4)],J):-//TESTED
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,J) &
-	posicion(X0+4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
+	posicion(X0+4,Y0+4,0)[source(self)] &
 	puedeColocar(X0,Y0) &
 	puedeColocar(X0+4,Y0+4).//TESTED
 ganarSiempreDiagonalAlpha([],J).
 
 ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):-//TESTED
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,J) &
-	posicion(X0-4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
+	posicion(X0-4,Y0+4,0)[source(self)] &
 	puedeColocar(X0,Y0) &
 	puedeColocar(X0-4,Y0+4).
 ganarSiempreDiagonalBeta([],J).
@@ -591,389 +574,410 @@ ganarSiempreDiagonalBeta([],J).
 
 /* Posiciones en las que tienes un tres en raya con solo una libre: +20*/
 tresEnRayaVertical([pos(X,Y0)],J):-//TESTED
-	posicion(X,Y0,0) &
-	posicion(X,Y0+1,J) &
-	posicion(X,Y0+2,J) &
-	posicion(X,Y0+3,J).
+	posicion(X,Y0,0)[source(self)] &
+	posicion(X,Y0+1,J)[source(self)] &
+	posicion(X,Y0+2,J)[source(self)] &
+	posicion(X,Y0+3,J)[source(self)].
 tresEnRayaVertical([],J).
 
 tresEnRayaHorizontalIzquierda([pos(X0,Y)],J):-//TESTED
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0,Y).
 tresEnRayaHorizontalIzquierda([],J).
 
 tresEnRayaHorizontalDerecha([pos(X0+3,Y)],J):-//TESTED
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,0) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,0)[source(self)] &
 	puedeColocar(X0+3,Y).
 tresEnRayaHorizontalDerecha([],J).
 
 tresEnRayaDiagonalAlphaDerechaAbajo([pos(X0,Y0)],J):-//TESTED
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0,Y0).
 tresEnRayaDiagonalAlphaDerechaAbajo([],J).
 	
 tresEnRayaDiagonalAlphaIzquierdaArriba([pos(X0+3,Y0+3)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
 	puedeColocar(X0+3,Y0+3).
 tresEnRayaDiagonalAlphaIzquierdaArriba([],J).
 
 tresEnRayaDiagonalBetaDerechaArriba([pos(X0,Y0)],J):-//TESTED
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0,Y0).
 tresEnRayaDiagonalBetaDerechaArriba([],J).
 
 tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0+3)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,0)[source(self)] &
 	puedeColocar(X0-3,Y0+3).
 tresEnRayaDiagonalBetaIzquierdaAbajo([],J).
 
 
 /* Posiciones en las que hay tres en cuatro y una para ganar: */
 tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J):-//TESTED
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,0) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,0)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0+2,Y).
 tresEnCuatroHorizontalCentroDerecha([],J).
 
 tresEnCuatroHorizontalCentroIzquierda([pos(X0+1,Y)],J):-//TESTED
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,0) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,0)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0+1,Y).
 tresEnCuatroHorizontalCentroIzquierda([],J).
 
 tresEnCuatroDiagonalAlphaCentroDerecha([pos(X0+2,Y0+2)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0+2,Y0+2).
 tresEnCuatroDiagonalAlphaCentroDerecha([],J).
 
 tresEnCuatroDiagonalAlphaCentroIzquierda([pos(X0+1,Y0+1)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,0) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,0)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0+1,Y0+1).
 tresEnCuatroDiagonalAlphaCentroIzquierda([],J).
 
 tresEnCuatroDiagonalBetaCentroDerecha([pos(X0-2,Y0+2)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,0) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,0)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0-2,Y0+2).
 tresEnCuatroDiagonalBetaCentroDerecha([],J).
 
 tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):-//TESTED
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0+1,0) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0+1,0)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0-1,Y0+1).
 tresEnCuatroDiagonalBetaCentroIzquierda([],J).
 
 
 /* Parejas horizontal que generan un trio que gana siempre: */
 parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,0) &
-	posicion(X0+4,Y,0) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,0)[source(self)] &
+	posicion(X0+4,Y,0)[source(self)] &
 	puedeColocar(X0+3,Y).
 parejaGanadoraHorizontalDerecha([],J).
 
 parejaGanadoraHorizontalIzquierda([pos(X0+1,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,0) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,J) &
-	posicion(X0+4,Y,0) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,0)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
+	posicion(X0+4,Y,0)[source(self)] &
 	puedeColocar(X0+1,Y).
 parejaGanadoraHorizontalIzquierda([],J).
 
 parejaGanadoraHorizontalCentral([pos(X0+2,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,0) &
-	posicion(X0+3,Y,J) &
-	posicion(X0+4,Y,0) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,0)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
+	posicion(X0+4,Y,0)[source(self)] &
 	puedeColocar(X0+2,Y).
 parejaGanadoraHorizontalCentral([],J).
 
 parejaGanadoraDiagonalAlphaDerecha([pos(X0+3,Y0+3)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,0) &
-	posicion(X0+4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
+	posicion(X0+4,Y0+4,0)[source(self)] &
 	puedeColocar(X0+3,Y0+3).
 parejaGanadoraDiagonalAlphaDerecha([],J).
 
 parejaGanadoraDiagonalAlphaIzquierda([pos(X0+1,Y0+1)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,0) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,J) &
-	posicion(X0+4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,0)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
+	posicion(X0+4,Y0+4,0)[source(self)] &
 	puedeColocar(X0+1,Y0+1).
 parejaGanadoraDiagonalAlphaIzquierda([],J).
 
 parejaGanadoraDiagonalAlphaCentral([pos(X0+2,Y0+2)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,J) &
-	posicion(X0+4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
+	posicion(X0+4,Y0+4,0)[source(self)] &
 	puedeColocar(X0+2,Y0+2).
 parejaGanadoraDiagonalAlphaCentral([],J).
 
 parejaGanadoraDiagonalBetaIzquierda([pos(X0+3,Y0+3)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,0) &
-	posicion(X0-4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,0)[source(self)] &
+	posicion(X0-4,Y0+4,0)[source(self)] &
 	puedeColocar(X0-3,Y0+3).
 parejaGanadoraDiagonalBetaIzquierda([],J).
 
 parejaGanadoraDiagonalBetaDerecha([pos(X0-1,Y0+1)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,0) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,J) &
-	posicion(X0-4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,0)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
+	posicion(X0-4,Y0+4,0)[source(self)] &
 	puedeColocar(X0-1,Y0+1).
 parejaGanadoraDiagonalBetaDerecha([],J).
 
 parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,0) &
-	posicion(X0-3,Y0+3,J) &
-	posicion(X0-4,Y0+4,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,0)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
+	posicion(X0-4,Y0+4,0)[source(self)] &
 	puedeColocar(X0-2,Y0+2).
 parejaGanadoraDiagonalBetaCentral([],J).
 
 /* Parejas que generan un trio: */
 /* Horizontales */
 parejaHorizontalIzquierda([pos(X0+2,Y)],J):-
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,0) &
-	posicion(X0+3,Y,0) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,0)[source(self)] &
+	posicion(X0+3,Y,0)[source(self)] &
 	puedeColocar(X0+2,Y).
 parejaHorizontalIzquierda([],J).
 
 parejaHorizontalDerecha([pos(X0+1,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,0) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,0)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0+1,Y).
 parejaHorizontalDerecha([],J).
 
 parejaHorizontalCentral([pos(X0,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,0) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,0)[source(self)] &
 	puedeColocar(X0,Y).
 parejaHorizontalCentral([],J).
 
 parejaHorizontalSeparadaIzquierda([pos(X0+1,Y)],J):-
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,0) &
-	posicion(X0+2,Y,J) &
-	posicion(X0+3,Y,0) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,0)[source(self)] &
+	posicion(X0+2,Y,J)[source(self)] &
+	posicion(X0+3,Y,0)[source(self)] &
 	puedeColocar(X+1,Y).
 parejaHorizontalSeparadaIzquierda([],J).
 
 parejaHorizontalSeparadaIzquierda([pos(X0+2,Y)],J):-
-	posicion(X0,Y,0) &
-	posicion(X0+1,Y,J) &
-	posicion(X0+2,Y,0) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,0)[source(self)] &
+	posicion(X0+1,Y,J)[source(self)] &
+	posicion(X0+2,Y,0)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0+2,Y).
 parejaHorizontalSeparadaIzquierda([],J).
 
 parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
-	posicion(X0,Y,J) &
-	posicion(X0+1,Y,0) &
-	posicion(X0+2,Y,0) &
-	posicion(X0+3,Y,J) &
+	posicion(X0,Y,J)[source(self)] &
+	posicion(X0+1,Y,0)[source(self)] &
+	posicion(X0+2,Y,0)[source(self)] &
+	posicion(X0+3,Y,J)[source(self)] &
 	puedeColocar(X0+1,Y).
 parejaHorizontalSeparadaCentro([],J).
 
 /* Verticales */
 parejaVertical([pos(X0,Y)],J):- 
-    posicion(X0,Y,0) & 
-    posicion(X0,Y+1,J) &
-    posicion(X0,Y+2,J).
+    posicion(X0,Y,0)[source(self)] & 
+    posicion(X0,Y+1,J)[source(self)] &
+    posicion(X0,Y+2,J)[source(self)].
 parejaVertical([],J).
 
 /* Diagonales Alpha */ 
 parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
 	puedeColocar(X0+2,Y0+2).
 parejaDiagonalAlphaIzquierda([],J).
 
 parejaDiagonalAlphaDerecha([pos(X0+1,Y0+1)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,0) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,0)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0+1,Y0+1).
 parejaDiagonalAlphaDerecha([],J).
 
 parejaDiagonalAlphaCentral([pos(X0,Y0)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
 	puedeColocar(X0,Y0).
 parejaDiagonalAlphaCentral([],J).
 
 parejaDiagonalAlphaSeparadaIzq([pos(X0+1,Y0+1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,0) &
-	posicion(X0+2,Y0+2,J) &
-	posicion(X0+3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,0)[source(self)] &
+	posicion(X0+2,Y0+2,J)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
 	puedeColocar(X0+1,Y0+1).
 parejaDiagonalAlphaSeparadaIzq([],J).
 
 parejaDiagonalAlphaSeparadaDer([pos(X0+2,Y0+2)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0+2,Y0+2).
 parejaDiagonalAlphaSeparadaDer([],J).
 
 parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,0) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,0)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,J)[source(self)] &
 	puedeColocar(X0+1,Y0+1).
 parejaDiagonalAlphaSeparadaCentro([],J).
 
 /* Diagonales Beta */
 parejaDiagonalBetaIzquierda([pos(X0+2,Y0+2)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0+1,J) &
-	posicion(X0+2,Y0+2,0) &
-	posicion(X0+3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0+1,J)[source(self)] &
+	posicion(X0+2,Y0+2,0)[source(self)] &
+	posicion(X0+3,Y0+3,0)[source(self)] &
 	puedeColocar(X0+2,Y0+2).
 parejaDiagonalBetaIzquierda([],J).
 
 parejaDiagonalBetaDerecha([pos(X0+1,Y0+1)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,0) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,0)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0-1,Y0+1).
 parejaDiagonalBetaDerecha([],J).
 
 parejaDiagonalBetaCentral([pos(X0,Y0)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,0) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,0)[source(self)] &
 	puedeColocar(X0,Y0).
 parejaDiagonalBetaCentral([],J).
 
 parejaGeDiagonalBetaSeparadaIzq([pos(X0-1,Y0+1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0+1,0) &
-	posicion(X0-2,Y0+2,J) &
-	posicion(X0-3,Y0+3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0+1,0)[source(self)] &
+	posicion(X0-2,Y0+2,J)[source(self)] &
+	posicion(X0-3,Y0+3,0)[source(self)] &
 	puedeColocar(X0-1,Y0+1).
 parejaGeDiagonalBetaSeparadaIzq([],J).
 
 parejaGeneraTrioDiagonalSeparadaDer([pos(X0-2,Y0+2)],J):-
-	posicion(X0,Y0,0) &
-	posicion(X0-1,Y0+1,J) &
-	posicion(X0-2,Y0+2,0) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,0)[source(self)] &
+	posicion(X0-1,Y0+1,J)[source(self)] &
+	posicion(X0-2,Y0+2,0)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0-2,Y0+2).
 parejaGeneraTrioDiagonalSeparadaDer([],J).
 
 parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0+1,0) &
-	posicion(X0-2,Y0+2,0) &
-	posicion(X0-3,Y0+3,J) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0+1,0)[source(self)] &
+	posicion(X0-2,Y0+2,0)[source(self)] &
+	posicion(X0-3,Y0+3,J)[source(self)] &
 	puedeColocar(X0-1,Y0+1).
 parejaDiagonalBetaSeparadaCentro([],J).
 
 /* Solo una ficha */
 solitaGeneraHorizontal([pos(X0+1,Y0)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0,0) & 
-	posicion(X0+2,Y0,0) &
-	posicion(X0+3,Y0,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0,0)[source(self)] & 
+	posicion(X0+2,Y0,0)[source(self)] &
+	posicion(X0+3,Y0,0)[source(self)] &
 	puedeColocar(X0+1,Y0).
 solitaGeneraHorizontal([],J).
 
 solitaGeneraVertical([pos(X0,Y0-1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0,Y0-1,0) & 
-	posicion(X0,Y0-2,0) &
-	posicion(X0,Y0-3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0,Y0-1,0)[source(self)] & 
+	posicion(X0,Y0-2,0)[source(self)] &
+	posicion(X0,Y0-3,0)[source(self)] &
 	puedeColocar(X0,Y0-1).
 solitaGeneraVertical([],J).
 
 solitaGeneraDiagonalAlpha([pos(X0-1,Y0-1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0-1,Y0-1,0) & 
-	posicion(X0-2,Y0-2,0) &
-	posicion(X0-3,Y0-3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0-1,Y0-1,0)[source(self)] & 
+	posicion(X0-2,Y0-2,0)[source(self)] &
+	posicion(X0-3,Y0-3,0)[source(self)] &
 	puedeColocar(X0-1,Y0-1).
 solitaGeneraDiagonalAlpha([],J).
 
 solitaGeneraDiagonalBeta([pos(X0+1,Y0-1)],J):-
-	posicion(X0,Y0,J) &
-	posicion(X0+1,Y0-1,0) & 
-	posicion(X0+2,Y0-2,0) &
-	posicion(X0+3,Y0-3,0) &
+	posicion(X0,Y0,J)[source(self)] &
+	posicion(X0+1,Y0-1,0)[source(self)] & 
+	posicion(X0+2,Y0-2,0)[source(self)] &
+	posicion(X0+3,Y0-3,0)[source(self)] &
 	puedeColocar(X0+1,Y0-1).
 solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
+fichaEnemiga(X):-
+	oponente(J)[source(self)] &
+	posicion(X,Y,J)[source(self)] &
+	posicion(X,Y-1,0)[source(self)].
+	
+contarFichas(Columna,Fila,Total+1):-
+	(Columna >= 0 & Columna < 8) &
+	(Fila >= 0 & Fila < 8) &
+	(tablero(Columna,Fila,1)[source(percept)] | 
+		tablero(Columna,Fila,2)[source(percept)]) &
+	contarFichas(Columna,Fila+1,Total).
 
+contarFichas(Columna,Fila,Total):-
+	(Columna >= 0 & Columna < 8) &
+	(Fila >= 0 & Fila < 8) &
+	contarFichas(Columna,Fila+1,Total).
 
+contarFichas(Columna,Fila,Total):-
+	(Columna >= 0 & Columna < 8) &
+	(Fila >= 8) &
+	contarFichas(Columna+1,0,Total).
+
+contarFichas(Columna,Fila,0):-
+	(Columna >= 8).
 
 /* INITIAL GOALS */
 
 
-//!encontrarMejorMovimiento(0,LMovimientos).
-!copiarTablero(0,0).
+!comienzo.
 
 
 /* PLANS */
@@ -982,11 +986,11 @@ solitaGeneraDiagonalBeta([],J).
 /*-----------------------JUEGAR A PERDER DE SEGUNDO---------------------------*/
 /*----------------------------------------------------------------------------*/
 /*	Busca la primera ficha del rival que no tenga una ficha del jugador colocada
-	encima y coloca su ficha encima de la del rival */		
+[source(self)]	encima y coloca su ficha encima de la del rival */		
 +!jugarAperderSegundo[source(self)]:
 	quienSoy(Jugador,Rival) &
-	posicion(X,Y,Rival) &
-	posicion(X,Y-1,0) <-
+	posicion(X,Y,Rival)[source(self)] &
+	posicion(X,Y-1,0)[source(self)] <-
 		put(X);
 		!jugar.
 /*----------------------------------------------------------------------------*/
@@ -996,22 +1000,22 @@ solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
 /*---------------------CREAR-BORRAR TABLERO TEMPORAL--------------------------*/
 /*----------------------------------------------------------------------------*/
-+!copiarTablero(Columna,Fila):
++!copiarTablero(Columna,Fila)[source(self)]:
 	(Columna >= 0 & Columna < 8) &
 	(Fila >= 0 & Fila < 8) <-	
 		?tablero(Columna,Fila,Jugador)[source(percept)];
 		.asserta(posicion(Columna,Fila,Jugador));
 		!copiarTablero(Columna,Fila+1).
-+!copiarTablero(Columna,Fila):
++!copiarTablero(Columna,Fila)[source(self)]:
 	(Columna >= 0 & Columna < 8) &
 	Fila = 8 <-
 		!copiarTablero(Columna+1,0).
-+!copiarTablero(Columna,Fila):
++!copiarTablero(Columna,Fila)[source(self)]:
 	Columna >= 8 <-
 		.print("Se ha generado el tablero temporal").//;
 		//!borrarTablero.
 
-+!borrarTablero <-
++!borrarTablero[source(self)] <-
 	.abolish(posicion(_,_,_)).
 /*----------------------------------------------------------------------------*/
 
@@ -1022,36 +1026,36 @@ solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
 
 // Si no hay celdas libres
-+!encontrarMejorMovimiento(Columna)[source(self)]:
-	not comprobarCeldasLibres[source(self)] <-
++!encontrarMejorMovimiento(Columna,Profundidad)[source(self)]:
+	not comprobarCeldasLibres <-
 		!jugar.
 // Si no se puede colocar en la columna
-+!encontrarMejorMovimiento(Columna)[source(self)]: 
++!encontrarMejorMovimiento(Columna,Profundidad)[source(self)]: 
 	(Columna < 8 & Columna >= 0) &
-	comprobarCeldasLibres[source(self)] &
-	not comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] <-
-		!encontrarMejorMovimiento(Columna+1).
+	comprobarCeldasLibres &
+	not comprobarCeldaLibreEnColumna(Columna,Fila) <-
+		!encontrarMejorMovimiento(Columna+1,Profundidad).
 // Si se puede colocar ficha en la columna
-+!encontrarMejorMovimiento(Columna)[source(self)]:
++!encontrarMejorMovimiento(Columna,Profundidad)[source(self)]:
 	(Columna < 8 & Columna >= 0) &
-	comprobarCeldasLibres[source(self)] &
-	comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] &
+	comprobarCeldasLibres &
+	comprobarCeldaLibreEnColumna(Columna,Fila) &
 	jugador(Jugador)[source(self)] <-
 		?posicion(Columna,Fila,0);
 		-posicion(Columna,Fila,0);
 		+posicion(Columna,Fila,Jugador);
 		.print("Columna: ",Columna,"-Fila: ",Fila,"- Ocupado por: ",Jugador);
-		?minMax(Jugador,2,Puntos,true);
+		?minMax(Jugador,Profundidad,Puntos,true);
 		.print("Acabo el minMax para columna: ",Columna," con ", Puntos);
 		!maximizar(Columna,Fila,Puntos);
 		-posicion(Columna,Fila,Jugador);
 		+posicion(Columna,Fila,0);
-		!encontrarMejorMovimiento(Columna+1).
+		!encontrarMejorMovimiento(Columna+1,Profundidad).
 // Si ya has comprobado todas las columnas
-+!encontrarMejorMovimiento(Columna)[source(self)]: 
++!encontrarMejorMovimiento(Columna,Profundidad)[source(self)]: 
 	Columna >= 8 &
 	movimientoMaximizado(X,Y,Puntos) <-
-		put(X).
+		.print("Encontrado el mejor movimiento...").
 /*----------------------------------------------------------------------------*/
 
 
@@ -1061,36 +1065,37 @@ solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
 
 // Si no hay celdas libres
-+!encontrarPeorMovimiento(Columna)[source(self)]:
-	not comprobarCeldasLibres[source(self)] <-
++!encontrarPeorMovimiento(Columna,Profundidad)[source(self)]:
+	not comprobarCeldasLibres <-
 		!jugar.
 // Si no se puede colocar en la columna
-+!encontrarPeorMovimiento(Columna)[source(self)]: 
++!encontrarPeorMovimiento(Columna,Profundidad)[source(self)]: 
 	(Columna < 8 & Columna >= 0) &
-	comprobarCeldasLibres[source(self)] &
-	not comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] <-
-		!encontrarPeorMovimiento(Columna+1).
+	comprobarCeldasLibres &
+	not comprobarCeldaLibreEnColumna(Columna,Fila) <-
+		!encontrarPeorMovimiento(Columna+1,Profundidad).
 // Si se puede colocar ficha en la columna
-+!encontrarPeorMovimiento(Columna)[source(self)]:
++!encontrarPeorMovimiento(Columna,Profundidad)[source(self)]:
 	(Columna < 8 & Columna >= 0) &
-	comprobarCeldasLibres[source(self)] &
-	comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] &
+	comprobarCeldasLibres &
+	comprobarCeldaLibreEnColumna(Columna,Fila) &
 	jugador(Jugador)[source(self)] <-
+		.print("NANI");
 		?posicion(Columna,Fila,0);
 		-posicion(Columna,Fila,0);
 		+posicion(Columna,Fila,Jugador);
 		.print("Columna: ",Columna," - Fila: ",Fila," - Ocupado por: ",Jugador);
-		?minMax(Jugador,2,Puntos,not true);
+		?minMax(Jugador,Profundidad,Puntos,not true);
 		.print("Acabo el minMax para columna: ",Columna," con ", Puntos);
 		!minimizar(Columna,Fila,Puntos);
 		-posicion(Columna,Fila,Jugador);
 		+posicion(Columna,Fila,0);
-		!encontrarPeorMovimiento(Columna+1).
+		!encontrarPeorMovimiento(Columna+1,Profundidad).
 // Si ya has comprobado todas las columnas
-+!encontrarPeorMovimiento(Columna)[source(self)]: 
++!encontrarPeorMovimiento(Columna,Profundidad)[source(self)]:
 	Columna >= 8 &
 	movimientoMinimizado(X,Y,Puntos) <-
-		put(X).
+		.print("Encontrado el peor movimiento...").
 /*----------------------------------------------------------------------------*/
 
 
@@ -1100,18 +1105,19 @@ solitaGeneraDiagonalBeta([],J).
 /*---------------------------MINIMIZAR-MAXIMIZAR------------------------------*/
 /*----------------------------------------------------------------------------*/
 +!maximizar(X,Y,Puntos)[source(self)]:
-	movimientoMaximizado(X1,Y1,Puntos1) &
-	Puntos > Puntos1 <-
+	movimientoMaximizado(X1,Y1,Puntos1)[source(self)] &
+	Puntos >= Puntos1 <-
 		-movimientoMaximizado(X1,Y1,Puntos1);
 		+movimientoMaximizado(X,Y,Puntos).
 +!maximizar(X,Y,Puntos)[source(self)].
 
+
 +!minimizar(X,Y,Puntos)[source(self)]:
-	movimientoMinizado(X1,Y1,Puntos1) &
-	Puntos < Puntos1 <-
+	movimientoMinizado(X1,Y1,Puntos1)[source(self)] &
+	Puntos <= Puntos1 <-
 		-movimientoMinizado(X1,Y1,Puntos1);
 		+movimientoMinizado(X,Y,Puntos).
-+!minimizar(Puntos)[source(self)].
++!minimizar(X,Y,Puntos)[source(self)].
 /*----------------------------------------------------------------------------*/
 
 
@@ -1119,29 +1125,23 @@ solitaGeneraDiagonalBeta([],J).
 /*---------------------------------TURNOS-------------------------------------*/
 /*----------------------------------------------------------------------------*/
 /* Define elementos iniciales tales como el primer turno */
-+!definiciones[source(self)]:
++!comienzo[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
 	quienSoy(X1,Y1) <- 
-		+primerTurno("primero");
 		+jugador(X1);
 		+oponente(Y1);
-		!borrarTablero;
-		!copiarTablero(0,0);
 		!jugar.
-+!definiciones[source(self)]:
++!comienzo[source(self)]:
 	turno(X)[source(percept)] &
 	not .my_name(X) &
 	quienSoy(X1,Y1) <- 
-		+primerTurno("segundo");
 		+jugador(X1);
 		+oponente(Y1);
-		!borrarTablero;
-		!copiarTablero(0,0);
 		!jugar.
-+!definiciones[source(self)] <- 
++!comienzo[source(self)] <- 
 	.wait(50); 
-	!definiciones.
+	!comienzo.
 /*----------------------------------------------------------------------------*/
 
 
@@ -1149,65 +1149,82 @@ solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
 /*---------------------------------JUGAR--------------------------------------*/
 /*----------------------------------------------------------------------------*/
+/* Gestiona la partida cuando juega a ganar y empieza primero */
++!jugar[source(self)]:
+	turno(X)[source(percept)] &
+	.my_name(X) &
+	oponente(J) &
+	estrategia(jugarAGanar)[source(percept)] &
+	not tablero(Columna,Fila,J)[source(percept)] <-
+		put(4);
+		.wait(1000);
+		!jugar.
+
+
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
 	estrategia(jugarAGanar)[source(percept)] <-
-		.print("hi").
-+!jugar[source(self)]:
-	turno(X) &
-	.my_name(X) &
-	estrategia(jugarAGanar) <-
-		.print("hi").
-
+		!borrarTablero;
+		!copiarTablero(0,0);
+		+movimientoMaximizado(-1,-1,-500);
+		!encontrarMejorMovimiento(0,1);
+		?movimientoMaximizado(Columna,Fila,P);
+		put(Columna);
+		.wait(1000);
+		.abolish(movimientoMaximizado(_,_,_));
+		!jugar.
 
 /* Gestiona la partida cuando juega a perder y empieza primero */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
 	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("primero")[source(self)] <-
-		.print("hi").
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("primero")[source(self)] <-
-		.print("hi").
+	not fichaEnemiga(X) <-
+		!borrarTablero;
+		!copiarTablero(0,0);
+		.asserta(movimientoMinimizado(-1,-1,-500));
+		!encontrarPeorMovimiento(0,2);
+		?movimientoMinimizado(Columna,Fila,P);
+		put(Columna)
+		.abolish(movimientoMinimizado(_,_,_));
+		!jugar.
 
-/* Gestiona la partida cuando juega a perder y empieza segundo */
+/* Gestiona la partida cuando juega a perder y empieza segundo */		
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		!jugarAperderSegundo.
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player2) &
-	estrategia(jugarAPerder)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		!jugarAperderSegundo.
+	estrategia(jugarAPerder)[source(percept)] <-
+		?fichaEnemiga(X);
+		put(X);
+		!jugar.
 
-/* Si es el turno del oponente no hace nada */
+/* Si es el turno del oponente no [source(self)]hace nada */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
-	not .my_name(X) <- 
-		.wait(50);
+	not .my_name(X) <-
+		//.print("Tengo que esperar a mi turno...");
+		.wait(500);
 		!jugar. 
 /*----------------------------------------------------------------------------*/
 
 
 
 /*---------------------------------ERRORES------------------------------------*/
-+!encontrarMejorMovimiento(_) <- .print("Error en +!encontrarMejorMovimiento").
-+!copiarTablero(_,_) <- .print("Error en +!copiarTablero").
-+!borrarTablero(_,_) <- .print("Error en +!borrarTablero").
-+!maximizarLista(_,_,_) <- .print("Error en +!maximizarLista").
-+!minimizarLista(_,_,_) <- .print("Error en +!minimizarLista").
-+!definiciones <- .print("Error en +!definiciones").
-+!jugar <- .print("Error en +!jugar").
-+!jugarAperderSegundo <- .print("Error en +!jugarAperderSegundo").
++!encontrarMejorMovimiento(_,_)[source(_)] <- 
+	.print("Error en +!encontrarMejorMovimiento").
++!encontrarPeorMovimiento(_,_)[source(_)] <- 
+	.print("Error en +!encontrarPeorMovimiento").
++!copiarTablero(_,_)[source(_)] <- 
+	.print("Error en +!copiarTablero").
++!borrarTablero(_,_)[source(_)] <- 
+	.print("Error en +!borrarTablero").
++!maximizar(_,_)[source(_)] <- 
+	.print("Error en +!maximizarLista").
++!minimizar(_,_)[source(_)] <- 
+	.print("Error en +!minimizarLista").
++!comienzo[source(_)] <- 
+	.print("Error en +!comienzo").
++!jugar[source(_)] <- 
+	.print("Error en +!jugar").
 /*----------------------------------------------------------------------------*/
