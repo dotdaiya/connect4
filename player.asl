@@ -495,7 +495,7 @@ minMax(Jugador,Profundidad,Puntos,Maximizar):-
 iterar(Columna,Jugador,Profundidad,Maximizar,[]):-
 	(Columna >= 8).
 /* Si no se puede colocar ficha en la columna */
-iterar(Columna,Jugador,Profundidad,Maximizar,[0|LMovimientos]):-
+iterar(Columna,Jugador,Profundidad,Maximizar,0):-
 	(Columna >= 0 & Columna < 8) &
 	comprobarCeldasLibres &
 	not comprobarCeldaLibreEnColumna(Columna,Fila) &
@@ -1217,4 +1217,9 @@ fichaEnemiga(X):-
 	.print("Error en +!comienzo").
 +!jugar[source(_)] <- 
 	.print("Error en +!jugar").
+/*----------------------------------------------------------------------------*/
+
+/*------------------------------EVITAR TRAMPAS--------------------------------*/
++!A[source(Agente)] <-
+	Agente \== percept.
 /*----------------------------------------------------------------------------*/
