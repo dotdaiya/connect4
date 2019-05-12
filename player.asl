@@ -495,7 +495,7 @@ minMax(Jugador,Profundidad,Puntos,Maximizar):-
 iterar(Columna,Jugador,Profundidad,Maximizar,[]):-
 	(Columna >= 8).
 /* Si no se puede colocar ficha en la columna */
-iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
+iterar(Columna,Jugador,Profundidad,Maximizar,[0|LMovimientos]):-
 	(Columna >= 0 & Columna < 8) &
 	comprobarCeldasLibres &
 	not comprobarCeldaLibreEnColumna(Columna,Fila) &
@@ -951,28 +951,9 @@ solitaGeneraDiagonalBeta([],J).
 /*----------------------------------------------------------------------------*/
 fichaEnemiga(X):-
 	oponente(J)[source(self)] &
-	posicion(X,Y,J)[source(self)] &
-	posicion(X,Y-1,0)[source(self)].
-	
-contarFichas(Columna,Fila,Total+1):-
-	(Columna >= 0 & Columna < 8) &
-	(Fila >= 0 & Fila < 8) &
-	(tablero(Columna,Fila,1)[source(percept)] | 
-		tablero(Columna,Fila,2)[source(percept)]) &
-	contarFichas(Columna,Fila+1,Total).
+	tablero(X,Y,J)[source(percept)] &
+	tablero(X,Y-1,0)[source(percept)].
 
-contarFichas(Columna,Fila,Total):-
-	(Columna >= 0 & Columna < 8) &
-	(Fila >= 0 & Fila < 8) &
-	contarFichas(Columna,Fila+1,Total).
-
-contarFichas(Columna,Fila,Total):-
-	(Columna >= 0 & Columna < 8) &
-	(Fila >= 8) &
-	contarFichas(Columna+1,0,Total).
-
-contarFichas(Columna,Fila,0):-
-	(Columna >= 8).
 
 /* INITIAL GOALS */
 
@@ -1080,14 +1061,13 @@ contarFichas(Columna,Fila,0):-
 	comprobarCeldasLibres &
 	comprobarCeldaLibreEnColumna(Columna,Fila) &
 	jugador(Jugador)[source(self)] <-
-		.print("NANI");
 		?posicion(Columna,Fila,0);
 		-posicion(Columna,Fila,0);
 		+posicion(Columna,Fila,Jugador);
 		.print("Columna: ",Columna," - Fila: ",Fila," - Ocupado por: ",Jugador);
-		?minMax(Jugador,Profundidad,Puntos,not true);
+		?minMax(Jugador,Profundidad,Puntos,true);
 		.print("Acabo el minMax para columna: ",Columna," con ", Puntos);
-		!minimizar(Columna,Fila,Puntos);
+		!maximizar(Columna,Fila,Puntos);
 		-posicion(Columna,Fila,Jugador);
 		+posicion(Columna,Fila,0);
 		!encontrarPeorMovimiento(Columna+1,Profundidad).
@@ -1149,7 +1129,7 @@ contarFichas(Columna,Fila,0):-
 /*----------------------------------------------------------------------------*/
 /*---------------------------------JUGAR--------------------------------------*/
 /*----------------------------------------------------------------------------*/
-/* Gestiona la partida cuando juega a ganar y empieza primero */
+/* Gestiona la partida cuando juega a ganar y empieza */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
@@ -1160,7 +1140,7 @@ contarFichas(Columna,Fila,0):-
 		.wait(1000);
 		!jugar.
 
-
+/* Gestiona la partida cuando juega a ganar y empieza segundo */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
@@ -1175,37 +1155,47 @@ contarFichas(Columna,Fila,0):-
 		.abolish(movimientoMaximizado(_,_,_));
 		!jugar.
 
-/* Gestiona la partida cuando juega a perder y empieza primero */
+/* Gestiona la partida cuando juega a perder y empieza segundo */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
 	estrategia(jugarAPerder)[source(percept)] &
-	not fichaEnemiga(X) <-
-		!borrarTablero;
-		!copiarTablero(0,0);
-		.asserta(movimientoMinimizado(-1,-1,-500));
-		!encontrarPeorMovimiento(0,2);
-		?movimientoMinimizado(Columna,Fila,P);
-		put(Columna)
-		.abolish(movimientoMinimizado(_,_,_));
+	fichaEnemiga(Y) <-
+		put(Y);
 		!jugar.
 
-/* Gestiona la partida cuando juega a perder y empieza segundo */		
+/* Gestiona la partida cuando juega a perder y empieza primero */
++!jugar[source(self)]:
+	turno(X)[source(percept)] &
+	.my_name(X) &
+	jugador(J) &
+	estrategia(jugarAPerder)[source(percept)] &
+	not tablero(Columna,Fila,J)[source(percept)] <-
+		put(4);
+		!jugar.
+
+/* Gestiona la partida cuando juega a perder y empezó primero*/
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
 	estrategia(jugarAPerder)[source(percept)] <-
-		?fichaEnemiga(X);
-		put(X);
+		!borrarTablero;
+		!copiarTablero(0,0);
+		+movimientoMaximizado(-1,-1,-500);
+		!encontrarPeorMovimiento(0,1);
+		?movimientoMaximizado(Columna,Fila,P);
+		put(Columna)
+		.abolish(movimientoMaximizado(_,_,_));
 		!jugar.
 
+		
+
+
 /* Si es el turno del oponente no [source(self)]hace nada */
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	not .my_name(X) <-
-		//.print("Tengo que esperar a mi turno...");
-		.wait(500);
-		!jugar. 
++!jugar[source(self)] <-
+	//.print("Tengo que esperar a mi turno...");
+	.wait(500);
+	!jugar. 
 /*----------------------------------------------------------------------------*/
 
 
