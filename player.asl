@@ -57,282 +57,210 @@ comprobarCeldaLibreEnColumna(Columna,Fila):-
 	puedeColocar(Columna,Fila).
 
 
-testing0:- //tresEnRayaDiagonalAlphaDerechaAbajo - tresEnRayaDiagonalAlphaIzquierdaArriba FUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,1)) & .asserta(posicion(1,4,1)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,2)) & .asserta(posicion(1,5,2)) & .asserta(posicion(2,5,1)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,1)) & .asserta(posicion(1,6,2)) & .asserta(posicion(2,6,1)) & .asserta(posicion(3,6,1)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,1)) & .asserta(posicion(1,7,2)) & .asserta(posicion(2,7,1)) & .asserta(posicion(3,7,2)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing1:- //ganarSiempreDiagonalBeta - tresEnRayaDiagonalBetaDerechaArriba - tresEnRayaDiagonalBetaIzquierdaAbajo FUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,1)) & .asserta(posicion(6,4,1)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,1)) & .asserta(posicion(5,5,2)) & .asserta(posicion(6,5,2)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,1)) & .asserta(posicion(4,6,2)) & .asserta(posicion(5,6,1)) & .asserta(posicion(6,6,1)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,0)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,2)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,2)) & .asserta(posicion(6,7,1)) & .asserta(posicion(7,7,0)).
-
-testing2:- //tresEnRayaVertical FUNCIONA
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,1)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,1)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,1)) & .asserta(posicion(1,7,0)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing3:- //tresEnRayaHorizontalIzquierda - tresEnRayaHorizontalDerecha FUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,1)) & .asserta(posicion(3,7,1)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing5:- //tresEnCuatroHorizontalCentroDerecha - tresEnCuatroHorizontalCentroIzquierdaFUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,1)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,1)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing6:- //tresEnCuatroDiagonalAlphaCentroDerecha - tresEnCuatroDiagonalAlphaCentroIzquierdaFUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,1)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,1)) & .asserta(posicion(2,4,1)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,0)) & .asserta(posicion(1,5,2)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,1)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,1)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,1)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).	
-
-testing7:- //tresEnCuatroDiagonalBetaCentroDerecha - tresEnCuatroDiagonalBetaCentroIzquierdaFUNCIONAN
-	.abolish(posicion(_,_,_)) &
-	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-	.asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,1)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-	.asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,1)) & .asserta(posicion(5,3,1)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-	.asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,2)) & .asserta(posicion(5,4,2)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-	.asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,1)) & .asserta(posicion(3,5,1)) & .asserta(posicion(4,5,1)) & .asserta(posicion(5,5,1)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,1)) & .asserta(posicion(2,6,2)) & .asserta(posicion(3,6,1)) & .asserta(posicion(4,6,2)) & .asserta(posicion(5,6,2)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,2)) & .asserta(posicion(2,7,2)) & .asserta(posicion(3,7,2)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,1)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing8:-//parejaHorizontalIzquierda - parejaHorizontalDerecha - parejaDiagonalAlphaIzquierda
-    .abolish(posicion(_,_,_)) &
-    .asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-    .asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-    .asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-    .asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-    .asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,2)) & .asserta(posicion(5,4,1)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-    .asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,1)) & .asserta(posicion(5,5,1)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-    .asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,2)) & .asserta(posicion(5,6,2)) & .asserta(posicion(6,6,1)) & .asserta(posicion(7,6,0)) &
-    .asserta(posicion(0,7,1)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,1)) & .asserta(posicion(6,7,1)) & .asserta(posicion(7,7,1)).
-
-testing9:- //parejaGanadoraHorizontalCentral
-    .abolish(posicion(_,_,_)) &
-    .asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-    .asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-    .asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-    .asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-    .asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-    .asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-    .asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-    .asserta(posicion(0,7,0)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,1)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing10:- //parejaGanadoraDiagonalAlphaDerecha - parejaGanadoraDiagonalAlphaIzquierda
-    .abolish(posicion(_,_,_)) &
-    .asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-    .asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-    .asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-    .asserta(posicion(0,3,2)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-    .asserta(posicion(0,4,2)) & .asserta(posicion(1,4,2)) & .asserta(posicion(2,4,1)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-    .asserta(posicion(0,5,2)) & .asserta(posicion(1,5,2)) & .asserta(posicion(2,5,2)) & .asserta(posicion(3,5,1)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-    .asserta(posicion(0,6,2)) & .asserta(posicion(1,6,2)) & .asserta(posicion(2,6,2)) & .asserta(posicion(3,6,2)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-    .asserta(posicion(0,7,2)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,2)) & .asserta(posicion(3,7,2)) & .asserta(posicion(4,7,2)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing11:- //parejaGanadoraDiagonalAlphaCentral
-    .abolish(posicion(_,_,_)) &
-    .asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-    .asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-    .asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-    .asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-    .asserta(posicion(0,4,2)) & .asserta(posicion(1,4,1)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-    .asserta(posicion(0,5,2)) & .asserta(posicion(1,5,2)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-    .asserta(posicion(0,6,2)) & .asserta(posicion(1,6,2)) & .asserta(posicion(2,6,2)) & .asserta(posicion(3,6,1)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-    .asserta(posicion(0,7,2)) & .asserta(posicion(1,7,2)) & .asserta(posicion(2,7,2)) & .asserta(posicion(3,7,2)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-testing12:- //
-    .abolish(posicion(_,_,_)) &
-    .asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
-    .asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
-    .asserta(posicion(0,2,0)) & .asserta(posicion(1,2,0)) & .asserta(posicion(2,2,0)) & .asserta(posicion(3,2,0)) & .asserta(posicion(4,2,0)) & .asserta(posicion(5,2,0)) & .asserta(posicion(6,2,0)) & .asserta(posicion(7,2,0)) &
-    .asserta(posicion(0,3,0)) & .asserta(posicion(1,3,0)) & .asserta(posicion(2,3,0)) & .asserta(posicion(3,3,0)) & .asserta(posicion(4,3,0)) & .asserta(posicion(5,3,0)) & .asserta(posicion(6,3,0)) & .asserta(posicion(7,3,0)) &
-    .asserta(posicion(0,4,0)) & .asserta(posicion(1,4,0)) & .asserta(posicion(2,4,0)) & .asserta(posicion(3,4,0)) & .asserta(posicion(4,4,0)) & .asserta(posicion(5,4,0)) & .asserta(posicion(6,4,0)) & .asserta(posicion(7,4,0)) &
-    .asserta(posicion(0,5,0)) & .asserta(posicion(1,5,0)) & .asserta(posicion(2,5,0)) & .asserta(posicion(3,5,0)) & .asserta(posicion(4,5,0)) & .asserta(posicion(5,5,0)) & .asserta(posicion(6,5,0)) & .asserta(posicion(7,5,0)) &
-    .asserta(posicion(0,6,0)) & .asserta(posicion(1,6,0)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
-    .asserta(posicion(0,7,0)) & .asserta(posicion(1,7,0)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
-
-
 /*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
 /* Obtener las puntuaciones del posicion contando el numero de trios, parejas 
 y candidatos ganadores siempre y ponderando su valor */
 
 /* Obtiene la puntuacion total del posicion */
-evaluarTablero(Jugador,jugarAGanar,50):-// Cuatro en raya
-	jugador(Jugador) &
-	ganarSiempre(Elem,Jugador) &
-	cuatroEnRaya(Jugador).
-evaluarTablero(Jugador,jugarAGanar,-50):-// Cuatro en raya
-	oponente(Jugador) &
-	cuatroEnRaya(Jugador).
-evaluarTablero(Jugador,jugarAPerder,-50):-// Cuatro en raya
-	jugador(Jugador) &
-	ganarSiempre(Elem,Jugador) &
-	cuatroEnRaya(Jugador).
-evaluarTablero(Jugador,jugarAPerder,50):-// Cuatro en raya
-	oponente(Jugador) &
-	ganarSiempre(Elem,Jugador) &
-	cuatroEnRaya(Jugador).
+evaluarTablero(J,jugarAGanar,50):-// Cuatro en raya
+	jugador(J) &
+	ganarSiempre(Elem,J) &
+	cuatroEnRaya(J).
+evaluarTablero(J,jugarAGanar,-50):-// Cuatro en raya
+	oponente(J) &
+	cuatroEnRaya(J).
+evaluarTablero(J,jugarAPerder,-50):-// Cuatro en raya
+	jugador(J) &
+	ganarSiempre(Elem,J) &
+	cuatroEnRaya(J).
+evaluarTablero(J,jugarAPerder,50):-// Cuatro en raya
+	oponente(J) &
+	ganarSiempre(Elem,J) &
+	cuatroEnRaya(J).
 
-evaluarTablero(Jugador,jugarAGanar,45):-// Tres en raya ganar siempre
-	jugador(Jugador) &
-	ganarSiempre(Elem,Jugador) &
+evaluarTablero(J,jugarAGanar,45):-// Tres en raya ganar siempre
+	jugador(J) &
+	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
 	.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAGanar,-45):-// Tres en raya ganar siempre
-	oponente(Jugador) &
-	ganarSiempre(Elem,Jugador) &
+evaluarTablero(J,jugarAGanar,-45):-// Tres en raya ganar siempre
+	oponente(J) &
+	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
 	.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAPerder,-45):-// Tres en raya ganar siempre
-	jugador(Jugador) &
-	ganarSiempre(Elem,Jugador) &
+evaluarTablero(J,jugarAPerder,-45):-// Tres en raya ganar siempre
+	jugador(J) &
+	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
 	.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAPerder,45):-// Tres en raya ganar siempre
-	oponente(Jugador) &
-	ganarSiempre(Elem,Jugador) &
+evaluarTablero(J,jugarAPerder,45):-// Tres en raya ganar siempre
+	oponente(J) &
+	ganarSiempre(Elem,J) &
 	.length(Elem,X) &
 	.print("tresEnRayaGanarSiempre-Length: ", X) &
 	X >= 1 .
 
-evaluarTablero(Jugador,jugarAGanar,45):-// >1 trio
-	jugador(Jugador) &
+evaluarTablero(J,jugarAGanar,45):-// >1 trio
+	jugador(J) &
 	trios(Elem,J) &
 	.length(Elem,X) &
 	.print(">1trio-Length: ", X) & 
 	X > 1.
-evaluarTablero(Jugador,jugarAGanar,-45):-// >1 trio
-	oponente(Jugador) &
+evaluarTablero(J,jugarAGanar,-45):-// >1 trio
+	oponente(J) &
 	trios(Elem,J) &
 	.length(Elem,X) &
 	.print(">1trio-Length: ", X) & 
 	X > 1.
-evaluarTablero(Jugador,jugarAPerder,-45):-// >1 trio
-	jugador(Jugador) &
+evaluarTablero(J,jugarAPerder,-45):-// >1 trio
+	jugador(J) &
 	trios(Elem,J) &
 	.length(Elem,X) &
 	.print(">1trio-Length: ", X) & 
 	X > 1.
-evaluarTablero(Jugador,jugarAPerder,45):-// >1 trio
-	oponente(Jugador) &
+evaluarTablero(J,jugarAPerder,45):-// >1 trio
+	oponente(J) &
 	trios(Elem,J) &
 	.length(Elem,X) &
 	.print(">1trio-Length: ", X) & 
 	X > 1.
 
-evaluarTablero(Jugador,jugarAGanar,35+X):-// Un solo trio
-	jugador(Jugador) &
+evaluarTablero(J,jugarAGanar,35):-// Un solo trio
+	jugador(J) &
 	trios(Elem,J) &
 	.print("1trio") & 
 	.length(Elem,1).
-evaluarTablero(Jugador,jugarAGanar,-35-X):-// Un solo trio
-	oponente(Jugador) &
+evaluarTablero(J,jugarAGanar,-35):-// Un solo trio
+	oponente(J) &
 	trios(Elem,J) &
 	.print("1trio") & 
 	.length(Elem,1).
-evaluarTablero(Jugador,jugarAPerder,-35-X):-// Un solo trio
-	jugador(Jugador) &
+evaluarTablero(J,jugarAPerder,-35):-// Un solo trio
+	jugador(J) &
 	trios(Elem,J) &
 	.print("1trio") & 
 	.length(Elem,1).
-evaluarTablero(Jugador,jugarAPerder,35+X):-// Un solo trio
-	oponente(Jugador) &
+evaluarTablero(J,jugarAPerder,35):-// Un solo trio
+	oponente(J) &
 	trios(Elem,J) &
 	.print("1trio") & 
 	.length(Elem,1).
 
-evaluarTablero(Jugador,jugarAGanar,30+X):-// Una pareja ganadora
-	jugador(Jugador) &
+evaluarTablero(J,jugarAGanar,30+X):-// Una pareja ganadora
+	jugador(J) &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
 	.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAGanar,-30-X):-// Una pareja ganadora
-	oponente(Jugador) &
+evaluarTablero(J,jugarAGanar,-30-X):-// Una pareja ganadora
+	oponente(J) &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
 	.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAPerder,-30-X):-// Una pareja ganadora
-	jugador(Jugador) &
+evaluarTablero(J,jugarAPerder,-30-X):-// Una pareja ganadora
+	jugador(J) &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
 	.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
-evaluarTablero(Jugador,jugarAPerder,30+X):-// Una pareja ganadora
-	oponente(Jugador) &
+evaluarTablero(J,jugarAPerder,30+X):-// Una pareja ganadora
+	oponente(J) &
 	parejaGanadora(Elem,J) &
 	.length(Elem,X) &
 	.print("parejaGanadora-Length: ", X) &
 	X >= 1 .
 
-evaluarTablero(Jugador,jugarAGanar,10+X):-// Jugadas comunes con parejas
-	jugador(Jugador) &
+evaluarTablero(J,jugarAGanar,10+X):-// Jugadas comunes con parejas
+	jugador(J) &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
 	.print("jugadasComunes-Length: ", X) &
 	X >= 1.
-evaluarTablero(Jugador,jugarAGanar,-10-X):-// Jugadas comunes con parejas
-	oponente(Jugador) &
+evaluarTablero(J,jugarAGanar,-10-X):-// Jugadas comunes con parejas
+	oponente(J) &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
 	.print("jugadasComunes-Length: ", X) &
 	X >= 1.
-evaluarTablero(Jugador,jugarAPerder,-10-X):-// Jugadas comunes con parejas
-	jugador(Jugador) &
+evaluarTablero(J,jugarAPerder,-10-X):-// Jugadas comunes con parejas
+	jugador(J) &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
 	.print("jugadasComunes-Length: ", X) &
 	X >= 1.
-evaluarTablero(Jugador,jugarAPerder,10+X):-// Jugadas comunes con parejas
-	oponente(Jugador) &
+evaluarTablero(J,jugarAPerder,10+X):-// Jugadas comunes con parejas
+	oponente(J) &
 	jugadasComunes(Elem,J) &
 	.length(Elem,X) &
 	.print("jugadasComunes-Length: ", X) &
 	X >= 1.
 
 
+	/*Obtiene la puntuacion de las parejas encontradas
+
+	Horizontales:15 
+	Diagonales:20
+	Verticales:10
+	Generan trios Horizontales:60
+	Generan trios Diagonales:65
+	*/		
+
+evaluarTablero(J,jugarAGanar,9):-// Tres solas
+	jugador(J) &
+	solitaGeneraTres(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAGanar,-9):-// Tres solas
+	oponente(J) &
+	solitaGeneraTres(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,-9):-// Tres solas
+	jugador(J) &
+	solitaGeneraTres(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,9):-// Tres solas
+	oponente(J) &
+	solitaGeneraTres(Elem,J) &
+	.print("jugadasComunes").
+
+evaluarTablero(J,jugarAGanar,7):-// Dos solas
+	jugador(J) &
+	solitaGeneraDos(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAGanar,-7):-// Dos solas
+	oponente(J) &
+	solitaGeneraDos(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,-7):-// Dos solas
+	jugador(J) &
+	solitaGeneraDos(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,7):-// Dos solas
+	oponente(J) &
+	solitaGeneraDos(Elem,J) &
+	.print("jugadasComunes").
+
+evaluarTablero(J,jugarAGanar,4):-// Una sola
+	jugador(J) &
+	solitaGeneraUna(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAGanar,-4):-// Una sola
+	oponente(J) &
+	solitaGeneraUna(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,-4):-// Una sola
+	jugador(J) &
+	solitaGeneraUna(Elem,J) &
+	.print("jugadasComunes").
+evaluarTablero(J,jugarAPerder,4):-// Una sola
+	oponente(J) &
+	solitaGeneraUna(Elem,J) &
+	.print("jugadasComunes").
+
+evaluarTablero(_,_,0).// Predeterminado
 	/*Obtiene la puntuacion de las parejas encontradas
 
 	Horizontales:15 
@@ -386,6 +314,41 @@ trios(Final,J):-
 	.union(C0,C1,D0) &
 	.union(C2,D0,E0) &
 	.union(C0,A12,Final).
+
+
+/* Solas */
+solitaGeneraTres([pos(X0,Y0)],J):-
+	solitaGeneraHorizontal([pos(X0,Y0)],J) &
+	solitaGeneraVertical([pos(X1,Y1)],J) &
+	((X1=X0-1) & (Y1=Y0-1)) &
+	solitaGeneraDiagonalAlpha([pos(X2,Y2)],J) &
+	((X2=X0-2) & (Y2=Y0-1)).
+solitaGeneraTres([pos(X0,Y0)],J):-
+    solitaGeneraHorizontal([pos(X0,Y0)],J) &
+    solitaGeneraVertical([pos(X1,Y1)],J) &
+   	((X1=X0+1) & (Y1=Y0-1)) &
+    solitaGeneraDiagonalBeta([pos(X2,Y2)],J) &
+   	((X2=X0+2) & (Y2=Y0-1)).
+
+solitaGeneraDos([pos(X0,Y0)],J):-
+	solitaGeneraHorizontal([pos(X0,Y0)],J) &
+	solitaGeneraVertical([pos(X1,Y1)],J) &
+	((X1=X0-1) & (Y1=Y0-1)).
+solitaGeneraDos([pos(X0,Y0)],J):-
+    solitaGeneraHorizontal([pos(X0,Y0)],J) &
+    solitaGeneraDiagonalAlpha([pos(X2,Y2)],J) &
+   	((X2=X0-2) & (Y2=Y0-1)).
+solitaGeneraDos([pos(X0,Y0)],J):-
+	solitaGeneraHorizontal([pos(X0,Y0)],J) &
+	solitaGeneraDiagonalBeta([pos(X2,Y2)],J) &
+   	((X2=X0+2) & (Y2=Y0-1)).
+
+solitaGeneraUna([pos(X0,Y0)],J):-
+	(solitaGeneraHorizontal([pos(X0,Y0)],J) |
+	solitaGeneraVertical([pos(X0,Y0)],J) |
+	solitaGeneraDiagonalAlpha([pos(X0,Y0)],J) |
+	solitaGeneraDiagonalBeta([pos(X0,Y0)],J)).
+solitaGeneraUna([],J).
 
 
 /* Una pareja que desemboque en una ganadora */
@@ -456,6 +419,8 @@ jugadasComunes(I2,J):-
 		.union(ParejasH,ParejasD,A0) &
 		.union(A0,ParejasV,A1) &
 		.union(A1,ParejasGanadora,A2).
+
+
 
 /*----------------------------------------------------------------------------*/
 
@@ -1000,28 +965,6 @@ solitaGeneraDiagonalBeta([pos(X0+1,Y0-1)],J):-
 	posicion(X0+3,Y0-3,0) &
 	puedeColocar(X0+1,Y0-1).
 solitaGeneraDiagonalBeta([],J).
-
-
-/* Para una sola ficha */
-solitaGeneraTres([pos(X0,Y0)],J):-
-    solitaGeneraHorizontal([pos(X0,Y0)],J) &
-    solitaGeneraVertical([pos(X1,Y1)],J) &
-   	((X1=X0-1) & (Y1=Y0-1)) &
-    solitaGeneraDiagonalAlpha([pos(X2,Y2)],J) &
-   	((X2=X0-2) & (Y2=Y0-1)).
-solitaGeneraTres([pos(X0,Y0)],J):-
-      solitaGeneraHorizontal([pos(X0,Y0)],J) &
-    solitaGeneraVertical([pos(X1,Y1)],J) &
-   	((X1=X0+1) & (Y1=Y0-1)) &
-    solitaGeneraDiagonalBeta([pos(X2,Y2)],J) &
-   	((X2=X0+2) & (Y2=Y0-1)).
-
-solitaGeneraUna([pos(X0,Y0)],J):-
-	(solitaGeneraHorizontal([pos(X0,Y0)],J) |
-	solitaGeneraVertical([pos(X0,Y0)],J) |
-	solitaGeneraDiagonalAlpha([pos(X0,Y0)],J) |
-	solitaGeneraDiagonalBeta([pos(X0,Y0)],J)).
-solitaGeneraUna([],J).
 /*----------------------------------------------------------------------------*/
 
 
