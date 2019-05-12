@@ -1,44 +1,428 @@
 // Agent player in project connect4.mas2j
 
+/* ALPHA: Es una diagonal en la que las dos componentes son la suma de las 
+   anteriores. Es decir la diagonal va de izquierda arriba a abajo derecha.
+  
+ * BETA: Es una diagonal en la que la componenet X es la resta de la anterior
+   y la componente Y la suma de la anterior. Es decir la diagonal va de derecha
+   arriba a abajo izquierda.*/
+
+/* BELIEFS AND RULES */
+/*----------------------------BELIEFS INICIALES-------------------------------*/
+mejorMovimiento(mov(-1,-1,-100000)). // El mejor movimiento a realizar
+profundidad(3). // La profundidad de búsqueda del árbol minmax
+jugador(1). // TEMPORAL
+oponente(2). // TEMPORAL
+/*----------------------------------------------------------------------------*/
 
 
-/* Initial beliefs and rules */
-
-
-/*ALPHA: Es una diagonal en la que las dos componentes son la suma de las 
-  anteriores. Es decir la diagonal va de izquierda arriba a abajo derecha. */
-
-
-/*BETA: Es una diagonal en la que la componenet X es la resta de la anterior
-  y la componente Y la suma de la anterior. Es decir la diagonal va de derecha
-  arriba a abajo izquierda.
-
-
-/* Calcula si un celda esta ocupada por el rival o fuera del posicion */
-/* Falta implementar jugadorOponente(J) */
-ocupadoFueraDeTablero(X,Y,J):-
-	(X >= 0 & X <= 7) &
-	(Y >= 0 & Y <= 7) &
-	posicion(X,Y,jugadorOponente(J)).
 
 /*  Define quien es el jugador y quien es el rival de forma numerica en funcion 
-	del nombre, queda comprobado que el posicion solo reconoce a los agentes con el 
-	nombre indicado */
+	del nombre, queda comprobado que el posicion solo reconoce a los agentes con
+	el nombre indicado */
 quienSoy(1,2):-
 	  .my_name(player1).
 quienSoy(2,1):-
 	  .my_name(player2).
 
-/* Comprueba si se puede colocar en una posición por encima de la fila siete */
-puedeColocar(X,Y1):- //Tested 
+/* Comprueba si se puede colocar en una posición por encima de la fila siete */ 
+puedeColocar(X,Y):- //Tested 
+	posicion(X,Y,0) &
     (X >= 0 & X < 8) &
-    Y = Y1 + 1 &
-     posicion(X,Y1,0) &
-    (posicion(X,Y,1) | posicion(X,Y,2))&
-    (Y >= 0 & Y < 8).
-
+    (Y >= 0 & Y < 8) &
+    (posicion(X,Y+1,1) | posicion(X,Y+1,2)).
 puedeColocar(X,7):- //Tested
-posicion(X,7,0).
+    posicion(X,7,0).
+
+
+/* Comprueba que aún se puede realizar movimientos */
+comprobarCeldasLibres:- //Tested
+	posicion(X,Y,0).
+
+
+/* Comprueba que aún hay celdas libres en una columna */
+comprobarCeldaLibreEnColumna(Columna,Fila):-
+	(Columna >= 0 & Columna < 8) &
+	puedeColocar(Columna,Fila).
+
+
+
+/*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
+/* Obtener las puntuaciones del posicion contando el numero de trios, parejas 
+y candidatos ganadores siempre y ponderando su valor */
+
+/* Obtiene la puntuacion total del posicion */
+evaluarTablero(Puntuacion,Jugador,jugarAGanar):-
+	puntuacionParejas(P,Jugador) &
+	puntuacionGanarSiempre(Q,Jugador) &
+	puntuacionTrios(R,Jugador) &
+	jugadasComunes(S,Jugador) &
+	(Puntuacion = P+Q+R+S).
+evaluarTablero(Puntuacion,Jugador,jugarAPerder):-
+	puntuacionGanarSiempre(Q,Jugador) &
+	puntuacionTrios(R,Jugador) &
+	jugadasComunes(S,Jugador) &
+	puntuacionParejas(P,Jugador) &
+	(Puntuacion = -P-Q-R-S).
+
+
+/*Obtiene la puntuacion de las parejas encontradas
+
+	Horizontales:15 
+	Diagonales:20
+	Verticales:10
+	Generan trios Horizontales:60
+	Generan trios Diagonales:65
+	*/		
+puntuacionParejas(Total,Jugador):-
+	parejasHorizontales(Lista1,Jugador) &
+	parejasTriosGanadorasH(Lista2,Jugador) &
+	parejasTriosGanadorasD(Lista3,Jugador) &
+	parejasDiagonales(Lista4,Jugador) &
+	parejaVertical(Lista5,Jugador) & 
+	.length(Lista1,Puntuacion) &
+	.length(Lista2,Puntuacion2) &
+	.length(Lista3,Puntuacion3) &
+	.length(Lista4,Puntuacion4) &
+	.length(Lista5,Puntuacion5) &
+	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacion4*20 + Puntuacion5*10.
+
+
+/*Obtiene la puntuacion de los candidatos a ganar siempre 90/100 */
+puntuacionGanarSiempre(Total,Jugador):-
+	ganarSiempre(L,Jugador) &
+	.length(L,Puntuacion) &
+	Total = Puntuacion*90.
+
+
+
+/* Halla los trios que ganan siempre */
+ganarSiempre(Final,J):-
+    ganarSiempreHorizontal(A,J) &
+    ganarSiempreDiagonalAlpha(B,J) &
+    ganarSiempreDiagonalBeta(C,J) &
+    .concat(A,B,L) &
+    .concat(C,L,Final).
+
+
+/* Halla las parejas que generan un trio que ganan siempre */
+parejasTriosGanadorasH(L,J):-
+	parejaGanadoraHorizontalDerecha(A,J) &
+	parejaGanadoraHorizontalIzquierda(B,J) &
+	parejaGanadoraHorizontalCentral(C,J) &
+	.concat(A,B,L) &
+	.concat(C,L,L2).
+parejasTriosGanadorasD(Final,J):-
+	parejaGanadoraDiagonalAlphaDerecha(A,J)&
+	parejaGanadoraDiagonalAlphaIzquierda(B,J) &
+	parejaGanadoraDiagonalAlphaCentral(C,J) &
+	parejaGanadoraDiagonalBetaIzquierda(D,J) &
+	parejaGanadoraDiagonalBetaDerecha(E,J) &
+	parejaGanadoraDiagonalBetaCentral(F,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(L,L2,L4) &
+	.concat(L4,L3,Final).
+
+
+/* 	Halla los trios en el posicion donde hay tres en cuatro y falta
+	una para ganar */
+trios(Final,J):-
+    tresEnCuatroHorizontalCentroDerecha(A,J) &
+    tresEnCuatroHorizontalCentroIzquierda(B,J) &
+    tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
+    tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
+    tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
+    tresEnCuatroDiagonalBetaCentroIzquierda(F,J) & 
+    .concat(A,B,L) &
+    .concat(C,D,L2) &
+    .concat(E,F,L3) &
+    .concat(L,L2,L4) &
+    .concat(L4,L3,Final).
+
+
+/* Posiciones en las que tienes un tres en raya con solo una libre */
+triosGananD(Final,J):-
+    tresEnRayaDiagonalAlphaDerechaAbajo(A,J) &
+    tresEnRayaDiagonalAlphaIzquierdaArriba(B,J) &
+    tresEnRayaDiagonalBetaDerechaArriba(C,J) &
+    tresEnRayaDiagonalBetaIzquierdaAbajo(D,J) & 
+    .concat(A,B,L) &
+    .concat(C,D,L2) &
+    .concat(L,L2,Final).
+triosGananH(Final,J):-
+    tresEnRayaHorizontalIzquierda(A,J) &
+    tresEnRayaHorizontalDerecha(B,J) &
+    .concat(A,B,Final).
+
+
+/* Halla las parejas disponibles en el posicion */
+parejasHorizontales(Final,J):-
+	parejaHorizontalIzquierda(A,J) &
+	parejaHorizontalDerecha(B,J) &
+	parejaHorizontalCentral(C,J) &
+	parejaHorizontalSeparadaIzquierda(D,J) &
+	parejaHorizontalSeparadaIzquierda(E,J) &
+	parejaHorizontalSeparadaCentro(F,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(L,L2,L4) &
+	.concat(L4,L3,Final).
+parejasDiagonales(Final,J):-
+	parejaDiagonalAlphaIzquierda(A,J) &
+	parejaDiagonalAlphaDerecha(B,J) &
+	parejaDiagonalAlphaCentral(C,J) &
+	parejaDiagonalAlphaSeparadaIzq(D,J) &
+	parejaDiagonalAlphaSeparadaDer(E,J) &
+	parejaDiagonalAlphaSeparadaCentro(F,J) &
+	parejaDiagonalBetaIzquierda(G,J) &
+	parejaDiagonalBetaDerecha(H,J) &
+	parejaDiagonalBetaCentral(I,J) &
+	parejaGeDiagonalBetaSeparadaIzq(K,J) &
+	parejaGeneraTrioDiagonalSeparadaDer(L,J) &
+	parejaDiagonalBetaSeparadaCentro(M,J) &
+	.concat(A,B,L) &
+	.concat(C,D,L2) &
+	.concat(E,F,L3) &
+	.concat(G,H,L4) &
+	.concat(I,K,L5) &
+	.concat(L,M,L6) &
+	.concat(L,L2,L7) &
+	.concat(L3,L4,L8) &
+	.concat(L5,L6,L9) &
+	.concat(L7,L8,L10) &
+	.concat(L9,L10,Final).
+
+
+/*
+	Obtiene la puntuacion de los trios encontrados
+			trio que les falta una para ganar 85
+			trios que ganan en Diagonal 75
+			trios que ganan en Horizontal 70
+			trios verticales 60
+*/
+puntuacionTrios(Total,Jugador):-
+	trios(Lista1,Jugador) &
+	triosGananH(Lista2,Jugador) &
+	triosGananD(Lista3,Jugador) &
+	tresEnRayaVertical(Lista4,Jugador) &
+	.length(Lista1,Puntuacion)&
+	.length(Lista2,Puntuacion2)&
+	.length(Lista3,Puntuacion3)&
+	.length(Lista4,Puntuacion4)&
+	Total = Puntuacion*85 + Puntuacion3*75 + Puntuacion2*70 + Puntuacion4*60.
+/*----------------------------------------------------------------------------*/
+
+
+
+
+
+/*SE SUBSTITUIRAN POR .INTERSECTION*/
+busqueda([],Lista,0).
+busqueda([pos(X,Y)|Tail],Lista,Resultado+Resultado2):-
+	comunes(pos(X,Y),Lista,Resultado) &
+	busqueda(Tail,Lista,Resultado2).
+comunes(pos(_,_),[],0).
+comunes(pos(X,Y),[pos(X,Y)|Tail],Resultado):-
+	comunes(pos(X,Y),Tail,Resultado+1).
+comunes(pos(X,Y),[pos(_,_)|Tail],Resultado):-
+	comunes(pos(X,Y),Tail,Resultado). 
+/***********************************/
+
+unoMismoComunes(_,[],0).
+unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(Y,X)|Tail2],Resultado):-
+	comunes(Tail,Tail2,Resultado+1). 
+unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
+	comunes(Tail,Tail2,Resultado). 
+
+
+
+
+
+
+/* Comprueba que nadie haya ganado la partida */
+nadieGano:- //Tested
+	not cuatroEnRayaHorizontal(1) &
+	not cuatroEnRayaVertical(1) &
+	not cuatroEnRayaDiagonalAlpha(1) &
+	not cuatroEnRayaDiagonalBeta(1) &
+	not cuatroEnRayaHorizontal(2) &
+	not cuatroEnRayaVertical(2) &
+	not cuatroEnRayaDiagonalAlpha(2) &
+	not cuatroEnRayaDiagonalBeta(2).
+
+
+/*Minimizar la puntuación de una lista de movimientos */
+minimizarLista(X,[],X).
+minimizarLista(Puntos0,[Puntos1|Tail],Puntos):-
+	Puntos1 <= Puntos0 &
+	minimizarLista(Puntos1,Tail,Puntos).
+minimizarLista(Puntos0,[Puntos1|Tail],Puntos):-
+	Puntos1 > Puntos0 &
+	minimizarLista(Puntos0,Tail,Puntos).
+
+
+/*Minimizar la puntuación de una lista de movimientos */
+maximizarLista(X,[],X).
+maximizarLista(Puntos0,[Puntos1|Tail],Puntos):-
+	Puntos1 >= Puntos0 &
+	maximizarLista(Puntos1,Tail,Puntos).
+maximizarLista(Puntos0,[Puntos1|Tail],Puntos):-
+	Puntos1 < Puntos0 &
+	maximizarLista(Puntos0,Tail,Puntos).
+
+
+/* Si gana o pierde devuelve ese movimiento */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	.print("GANAR O PERDER") &
+	evaluarTablero(Jugador,Estrategia,Puntos) &
+	(Puntos = 50 | Puntos = -50) &
+	.print("FIN GANAR O PERDER").
+/* En caso de empate */
+minMax(Jugador,Profundidad,0,Maximizar):-
+	.print("EMPATE minMax") &
+	not comprobarCeldasLibres &
+	evaluarTablero(Jugador,Estrategia,0) &
+	.print("FIN EMPATE minMax").
+/* Caso base */
+minMax(Jugador,0,Puntos,Maximizar):-
+	evaluarTablero(Jugador,Estrategia,Puntos).
+/* Turno de maximizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	Profundidad > 0 &
+	.print("MAXIMIZAR minMax") &
+	Maximizar &
+	oponente(Jugador2) &
+	.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","not true",")") &
+	iterar(0,Jugador2,Profundidad-1,not true,LMovimientos) &
+	maximizarLista(-5000,LMovimientos,Puntos) &
+	.print("FIN MAXIMIZAR minMax").
+/* Turno de minimizar */
+minMax(Jugador,Profundidad,Puntos,Maximizar):-
+	Profundidad > 0 &
+	.print("MINIMIZAR minMax") &
+	not Maximizar &
+	jugador(Jugador2) &
+	.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","true",")") &
+	iterar(0,Jugador2,Profundidad-1,true,LMovimientos) &
+	minimizarLista(5000,LMovimientos,Puntos) &
+	.print("FIN MINIMIZAR minMax").
+
+
+/* Ya se recorrieron todas las posibilidades de movimientos */
+iterar(Columna,Jugador,Profundidad,Maximizar,[]):-
+	(Columna >= 8).
+/* Si no se puede colocar ficha en la columna */
+iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
+	(Columna >= 0 & Columna < 8) &
+	comprobarCeldasLibres &
+	not comprobarCeldaLibreEnColumna(Columna,Fila) &
+	iterar(Columna+1,Jugador,Profundidad,Maximizar,LMovimientos).
+/* Para cada movimiento */
+iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
+	(Columna >= 0 & Columna < 8) &
+	comprobarCeldasLibres &
+	comprobarCeldaLibreEnColumna(Columna,Fila) &
+	posicion(Columna,Fila,W) &
+	.abolish(posicion(Columna,Fila,W)) &
+	.asserta(posicion(Columna,Fila,Jugador)) &
+	minMax(Jugador,Profundidad,Puntos,Maximizar) &
+	.abolish(posicion(Columna,Fila,Jugador)) &
+	.asserta(posicion(Columna,Fila,W)) &
+	iterar(Columna+1,Jugador,Profundidad,Maximizar,LMovimientos).
+
+
+/* Halla las jugadas comunes */
+jugadasComunes(Puntuacion,Jugador):-
+		parejasHorizontales(ParejasH,Jugador) &
+		parejasDiagonales(ParejasD,Jugador) &
+		parejaVertical(ParejasV,Jugador) & 
+		parejasTriosGanadorasH(ParejasTrioGananH,Jugador) &
+		parejasTriosGanadorasD(ParejasTrioGananD,Jugador) &
+		
+		trios(Trios3en4,Jugador) &
+		tresEnRayaVertical(TriosVertical,Jugador) &
+		triosGananH(TriosGananH,Jugador) &
+		triosGananD(TriosGananD,Jugador) &
+		
+		busqueda(ParejasH,ParejasD,P1) &
+		busqueda(ParejasH,ParejasV,P2) &
+		busqueda(ParejasH,ParejasTrioGananH,P3) &
+		busqueda(ParejasH,ParejasTrioGananH,P4) &
+		busqueda(ParejasH,Trios3en4,P5) &
+		busqueda(ParejasH,TriosVertical,P6) &
+		busqueda(ParejasH,TriosGananH,P7) &
+		busqueda(ParejasH,TriosGananD,P8) &
+		busqueda(ParejasD,ParejasV,P9) &
+		busqueda(ParejasD,ParejasTrioGananH,P10) &
+		busqueda(ParejasD,ParejasTrioGananD,P11) &
+		busqueda(ParejasD,Trios3en4,P12) &
+		busqueda(ParejasD,TriosVertical,P13) &
+		busqueda(ParejasD,TriosGananH,P14) &
+		busqueda(ParejasD,TriosGananD,P15) &
+		busqueda(ParejasV,ParejasTrioGananH,P16) &
+		busqueda(ParejasV,ParejasTrioGananD,P17) &
+		busqueda(ParejasV,Trios3en4,P18) &
+		busqueda(ParejasV,TriosVertical,P19) &
+		busqueda(ParejasV,TriosGananH,P20) &
+		busqueda(ParejasV,TriosGananD,P21) &
+		busqueda(ParejasTrioGananH,ParejasTrioGananD,P22) &
+		busqueda(ParejasTrioGananH,Trios3en4,P23) &
+		busqueda(ParejasTrioGananH,TriosVertical,P24) &
+		busqueda(ParejasTrioGananH,TriosGananH,P25) &
+		busqueda(ParejasTrioGananH,TriosGananD,P26) &
+		busqueda(ParejasTrioGananD,Trios3en4,P27) &
+		busqueda(ParejasTrioGananD,TriosVertical,P28) &
+		busqueda(ParejasTrioGananD,TriosGananH,P29) &
+		busqueda(ParejasTrioGananD,TriosGananD,P30) &
+		busqueda(Trios3en4,TriosVertical,P31) &
+		busqueda(Trios3en4,TriosGananH,P32) &
+		busqueda(Trios3en4,TriosGananD,P33) &
+		busqueda(TriosVertical,TriosGananH,P34) &
+		busqueda(TriosVertical,TriosGananD,P35) &
+		busqueda(TriosGananH,TriosGananD,P36) &
+		unoMismoComunes(ParejasH,ParejasH,P37) &
+		unoMismoComunes(ParejasD,ParejasD,P38) &
+		unoMismoComunes(ParejasV,ParejasV,P39) &
+		unoMismoComunes(ParejasTrioGananH,ParejasTrioGananH,P40) &
+		unoMismoComunes(ParejasTrioGananD,ParejasTrioGananD,P41) &
+		unoMismoComunes(Trios3en4,Trios3en4,P42) &
+		unoMismoComunes(TriosVertical,TriosVertical,P43) &
+		unoMismoComunes(TriosGananH,TriosGananH,P44) &
+		unoMismoComunes(TriosGananD,TriosGananD,P45) &
+		
+		Puntuacion = 	P1+P2+P3+P4+P5+P6+P7+P8+P9+P10+P11+P12+P13+P14+P15+
+						P16+P17+P18+P19+P20+P21+P22+P23+P24+P25+P26+P27+P28+
+						P29+P30+P31+P32+P33+P34+P35+P36+P37+P38+P39+P40+P41+
+						P42+P43+P44+P45.
+
+
+
+/*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
+/* Comprueba si hay un cuatro en raya en el posicion */
+cuatroEnRayaVertical(J):-
+	posicion(X,Y,J) &
+	posicion(X,Y+1,J) &
+	posicion(X,Y+2,J) &
+	posicion(X,Y+3,J).
+cuatroEnRayaHorizontal(J):-
+	posicion(X,Y,J) &
+	posicion(X+1,Y,J) &
+	posicion(X+2,Y,J) &
+	posicion(X+3,Y,J).
+cuatroEnRayaDiagonalAlpha(J):-
+	posicion(X,Y,J) &
+	posicion(X+1,Y+1,J) &
+	posicion(X+2,Y+2,J) &
+	posicion(X+3,Y+3,J).
+cuatroEnRayaDiagonalBeta(J):-
+	posicion(X,Y,J) &
+	posicion(X-1,Y+1,J) &
+	posicion(X-2,Y+2,J) &
+	posicion(X-3,Y+3,J).
+
 
 /* Posiciones en las que ganas siempre: +20 */
 ganarSiempreHorizontal([pos(X0,Y),pos(X0+4,Y)],J):-
@@ -70,6 +454,7 @@ ganarSiempreDiagonalBeta([pos(X0,Y0),pos(X0-4,Y0+4)],J):-
 	puedeColocar(X0,Y0) &
 	puedeColocar(X0-4,Y0+4).
 ganarSiempreDiagonalBeta([],J).
+
 
 /* Posiciones en las que tienes un tres en raya con solo una libre: +20*/
 tresEnRayaVertical([pos(X,Y0)],J):-
@@ -127,8 +512,8 @@ tresEnRayaDiagonalBetaIzquierdaAbajo([pos(X0-3,Y0-3)],J):-
 	puedeColocar(X0-3,Y0+3).
 tresEnRayaDiagonalBetaIzquierdaAbajo([],J).
 
-/* Posiciones en las que hay tres en cuatro y una para ganar:  */
 
+/* Posiciones en las que hay tres en cuatro y una para ganar: */
 tresEnCuatroHorizontalCentroDerecha([pos(X0+2,Y)],J):-
 	posicion(X0,Y,J) &
 	posicion(X0+1,Y,J) &
@@ -177,8 +562,8 @@ tresEnCuatroDiagonalBetaCentroIzquierda([pos(X0-1,Y0+1)],J):-
 	puedeColocar(X0-1,Y0+1).
 tresEnCuatroDiagonalBetaCentroIzquierda([],J).
 
-/* Parejas horizontal que generan un trio que gana siempre: */
 
+/* Parejas horizontal que generan un trio que gana siempre: */
 parejaGanadoraHorizontalDerecha([pos(X0+3,Y)],J):-
 	posicion(X0,Y,0) &
 	posicion(X0+1,Y,J) &
@@ -260,9 +645,8 @@ parejaGanadoraDiagonalBetaCentral([pos(X0-2,Y0+2)],J):-
 	puedeColocar(X0-2,Y0+2).
 parejaGanadoraDiagonalBetaCentral([],J).
 
-/* Parejas que generan un trio: */
-/* Horizontales */
 
+/* Horizontales */
 parejaHorizontalIzquierda([pos(X0+2,Y)],J):-
 	posicion(X0,Y,J) &
 	posicion(X0+1,Y,J) &
@@ -311,16 +695,16 @@ parejaHorizontalSeparadaCentro([pos(X0+1,Y)],J):-
 	puedeColocar(X0+1,Y).
 parejaHorizontalSeparadaCentro([],J).
 
-/* Verticales */
 
+/* Verticales */
 parejaVertical([pos(X0,Y)],J):- //Funciona
     posicion(X0,Y,0) & 
     posicion(X0,Y+1,J) &
     posicion(X0,Y+2,J).
 parejaVertical([],J).
 
-/* Diagonales Alpha */ 
 
+/* Diagonales Alpha */ 
 parejaDiagonalAlphaIzquierda([pos(X0+2,Y0+2)],J):-
 	posicion(X0,Y0,J) &
 	posicion(X0+1,Y0+1,J) &
@@ -369,8 +753,8 @@ parejaDiagonalAlphaSeparadaCentro([pos(X0+1,Y0+1)],J):-
 	puedeColocar(X0+1,Y0+1).
 parejaDiagonalAlphaSeparadaCentro([],J).
 
-/* Diagonales Beta */
 
+/* Diagonales Beta */
 parejaDiagonalBetaIzquierda([pos(X0+2,Y0+2)],J):-
 	posicion(X0,Y0,J) &
 	posicion(X0+1,Y0+1,J) &
@@ -418,332 +802,160 @@ parejaDiagonalBetaSeparadaCentro([pos(X0-1,Y0+1)],J):-
 	posicion(X0-3,Y0+3,J) &
 	puedeColocar(X0-1,Y0+1).
 parejaDiagonalBetaSeparadaCentro([],J).
- 
-	  
-/******************************************************************************/
-/****************	PUNTUACION TABLERO  ***************************************/
-/******************************************************************************/
-/*Obtener las puntuaciones del posicion contando el numero de trios, parejas 
-y candidatos ganadores siempre y ponderando su valor*/
-
-/* Obtiene la puntuacion total del posicion */
-evaluarTablero(Puntuacion,Jugador,jugarAGanar):-
-	puntuacionParejas(P,Jugador) &
-	puntuacionGanarSiempre(Q,Jugador) &
-	puntuacionTrios(R,Jugador) &
-	jugadasComunes(S,Jugador) &
-	(Puntuacion = P+Q+R+S).
-evaluarTablero(Puntuacion,Jugador,jugarAPerder):-
-	puntuacionGanarSiempre(Q,Jugador) &
-	puntuacionTrios(R,Jugador) &
-	jugadasComunes(S,Jugador) &
-	puntuacionParejas(P,Jugador) &
-	(Puntuacion = -P-Q-R-S).
+/*----------------------------------------------------------------------------*/
 
 
-/*Obtiene la puntuacion de las parejas encontradas
 
-	Horizontales:15 
-	Diagonales:20
-	Verticales:10
-	Generan trios Horizontales:60
-	Generan trios Diagonales:65
-	*/		
-puntuacionParejas(Total,Jugador):-
-	parejasHorizontales(Lista1,Jugador) &
-	parejasTriosGanadorasH(Lista2,Jugador) &
-	parejasTriosGanadorasD(Lista3,Jugador) &
-	parejasDiagonales(Lista4,Jugador) &
-	parejaVertical(Lista5,Jugador) & 
-	.length(Lista1,Puntuacion) &
-	.length(Lista2,Puntuacion2) &
-	.length(Lista3,Puntuacion3) &
-	.length(Lista4,Puntuacion4) &
-	.length(Lista5,Puntuacion5) &
-	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacion4*20 + Puntuacion5*10.
+/* INITIAL GOALS */
 
 
-/*Obtiene la puntuacion de los candidatos a ganar siempre 90/100 */
-puntuacionGanarSiempre(Total,Jugador):-
-	ganarSiempre(L,Jugador) &
-	.length(L,Puntuacion) &
-	Total = Puntuacion*90.
+//!encontrarMejorMovimiento(0,LMovimientos).
+!copiarTablero(0,0).
 
 
-/*
-	Obtiene la puntuacion de los trios encontrados
-			trio que les falta una para ganar 85
-			trios que ganan en Diagonal 75
-			trios que ganan en Horizontal 70
-			trios verticales 60
-	*/
-puntuacionTrios(Total,Jugador):-
-	trios(Lista1,Jugador) &
-	triosGananH(Lista2,Jugador) &
-	triosGananD(Lista3,Jugador) &
-	tresEnRayaVertical(Lista4,Jugador) &
-	.length(Lista1,Puntuacion)&
-	.length(Lista2,Puntuacion2)&
-	.length(Lista3,Puntuacion3)&
-	.length(Lista4,Puntuacion4)&
-	Total = Puntuacion*85 + Puntuacion3*75 + Puntuacion2*70 + Puntuacion4*60.
-	  
+/* PLANS */
 
-/*Halla las parejas disponibles en el posicion*/
-parejasHorizontales(Final,J):-
-	parejaHorizontalIzquierda(A,J) &
-	parejaHorizontalDerecha(B,J) &
-	parejaHorizontalCentral(C,J) &
-	parejaHorizontalSeparadaIzquierda(D,J) &
-	parejaHorizontalSeparadaIzquierda(E,J) &
-	parejaHorizontalSeparadaCentro(F,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(L,L2,L4) &
-	.concat(L4,L3,Final).
-parejasDiagonales(Final,J):-
-	parejaDiagonalAlphaIzquierda(A,J) &
-	parejaDiagonalAlphaDerecha(B,J) &
-	parejaDiagonalAlphaCentral(C,J) &
-	parejaDiagonalAlphaSeparadaIzq(D,J) &
-	parejaDiagonalAlphaSeparadaDer(E,J) &
-	parejaDiagonalAlphaSeparadaCentro(F,J) &
-	parejaDiagonalBetaIzquierda(G,J) &
-	parejaDiagonalBetaDerecha(H,J) &
-	parejaDiagonalBetaCentral(I,J) &
-	parejaGeDiagonalBetaSeparadaIzq(K,J) &
-	parejaGeneraTrioDiagonalSeparadaDer(L,J) &
-	parejaDiagonalBetaSeparadaCentro(M,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(G,H,L4) &
-	.concat(I,K,L5) &
-	.concat(L,M,L6) &
-	.concat(L,L2,L7) &
-	.concat(L3,L4,L8) &
-	.concat(L5,L6,L9) &
-	.concat(L7,L8,L10) &
-	.concat(L9,L10,Final).
+/*----------------------------------------------------------------------------*/
+/*-----------------------JUEGAR A PERDER DE SEGUNDO---------------------------*/
+/*----------------------------------------------------------------------------*/
+/*	Busca la primera ficha del rival que no tenga una ficha del jugador colocada
+	encima y coloca su ficha encima de la del rival */		
++!jugarAperderSegundo[source(self)]:
+	quienSoy(Jugador,Rival) &
+	posicion(X,Y,Rival) &
+	posicion(X,Y-1,0) <-
+		put(X);
+		!jugar.
+/*----------------------------------------------------------------------------*/
 
 
-/* Halla las parejas que generan un trio que ganan siempre */
-parejasTriosGanadorasH(L,J):-
-	parejaGanadoraHorizontalDerecha(A,J) &
-	parejaGanadoraHorizontalIzquierda(B,J) &
-	parejaGanadoraHorizontalCentral(C,J) &
-	.concat(A,B,L) &
-	.concat(C,L,L2).
-parejasTriosGanadorasD(Final,J):-
-	parejaGanadoraDiagonalAlphaDerecha(A,J)&
-	parejaGanadoraDiagonalAlphaIzquierda(B,J) &
-	parejaGanadoraDiagonalAlphaCentral(C,J) &
-	parejaGanadoraDiagonalBetaIzquierda(D,J) &
-	parejaGanadoraDiagonalBetaDerecha(E,J) &
-	parejaGanadoraDiagonalBetaCentral(F,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(L,L2,L4) &
-	.concat(L4,L3,Final).
+
+/*----------------------------------------------------------------------------*/
+/*---------------------CREAR-BORRAR TABLERO TEMPORAL--------------------------*/
+/*----------------------------------------------------------------------------*/
++!copiarTablero(Columna,Fila):
+	(Columna >= 0 & Columna < 8) &
+	(Fila >= 0 & Fila < 8) <-	
+		?tablero(Columna,Fila,Jugador)[source(percept)];
+		.asserta(posicion(Columna,Fila,Jugador));
+		!copiarTablero(Columna,Fila+1).
++!copiarTablero(Columna,Fila):
+	(Columna >= 0 & Columna < 8) &
+	Fila = 8 <-
+		!copiarTablero(Columna+1,0).
++!copiarTablero(Columna,Fila):
+	Columna >= 8 <-
+		.print("Se ha generado el tablero temporal").//;
+		//!borrarTablero.
+
++!borrarTablero <-
+	.abolish(posicion(_,_,_)).
+/*----------------------------------------------------------------------------*/
 
 
-/*Halla los trios en el posicion donde hay tres en cuatro y falta una para ganar*/
-trios(Final,J):-
-    tresEnCuatroHorizontalCentroDerecha(A,J) &
-    tresEnCuatroHorizontalCentroIzquierda(B,J) &
-    tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
-    tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
-    tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
-    tresEnCuatroDiagonalBetaCentroIzquierda(F,J) & 
-    .concat(A,B,L) &
-    .concat(C,D,L2) &
-    .concat(E,F,L3) &
-    .concat(L,L2,L4) &
-    .concat(L4,L3,Final).
+
+/*----------------------------------------------------------------------------*/
+/*-----------------------ENCONTRAR MEJOR MOVIMIENTO---------------------------*/
+/*----------------------------------------------------------------------------*/
+
+// Si no hay celdas libres
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]:
+	not comprobarCeldasLibres[source(self)] <-
+		!finPartida.
+// Si no se puede colocar en la columna
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]: 
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	not comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] <-
+		!encontrarMejorMovimiento(Columna+1,LMovimientos).
+// Si se puede colocar ficha en la columna
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]:
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] &
+	jugador(Jugador)[source(self)] <-
+		?posicion(Columna,Fila,0);
+		-posicion(Columna,Fila,0);
+		+posicion(Columna,Fila,Jugador);
+		?minMax(Jugador,3,Puntos,not true);
+		!maximizar(Columna,Fila,Puntos);
+		-posicion(Columna,Fila,Jugador);
+		+posicion(Columna,Fila,0);
+		!encontrarMejorMovimiento(Columna+1,[Puntos|LMovimientos]).
+// Si ya has comprobado todas las columnas
++!encontrarMejorMovimiento(Columna,LMovimientos)[source(self)]: 
+	Columna >= 8 &
+	movimientoMaximizado(X,Y,Puntos) <-
+		put(X).
+/*----------------------------------------------------------------------------*/
 
 
-/*Posiciones en las que tienes un tres en raya con solo una libre*/
-triosGananD(Final,J):-
-    tresEnRayaDiagonalAlphaDerechaAbajo(A,J) &
-    tresEnRayaDiagonalAlphaIzquierdaArriba(B,J) &
-    tresEnRayaDiagonalBetaDerechaArriba(C,J) &
-    tresEnRayaDiagonalBetaIzquierdaAbajo(D,J) & 
-    .concat(A,B,L) &
-    .concat(C,D,L2) &
-    .concat(L,L2,Final).
-triosGananH(Final,J):-
-    tresEnRayaHorizontalIzquierda(A,J) &
-    tresEnRayaHorizontalDerecha(B,J) &
-    .concat(A,B,Final).
+
+/*----------------------------------------------------------------------------*/
+/*---------------------------MINIMIZAR-MAXIMIZAR------------------------------*/
+/*----------------------------------------------------------------------------*/
++!maximizar(X,Y,Puntos)[source(self)]:
+	movimientoMaximizado(X1,Y1,Puntos1) &
+	Puntos > Puntos1 <-
+		-movimientoMaximizado(X1,Y1,Puntos);
+		+movimientoMaximizado(X,Y,Puntos1).
++!maximizar(X,Y,Puntos)[source(self)].
+
++!minimizar(X,Y,Puntos)[source(self)]:
+	movimientoMinizado(X1,Y1,Puntos1) &
+	Puntos < Puntos1 <-
+		-movimientoMinizado(X1,Y1,Puntos);
+		+movimientoMinizado(X,Y,Puntos1).
++!minimizar(Puntos)[source(self)].
+/*----------------------------------------------------------------------------*/
 
 
-/*Halla los trios que ganan siempre*/
-ganarSiempre(Final,J):-
-    ganarSiempreHorizontal(A,J) &
-    ganarSiempreDiagonalAlpha(B,J) &
-    ganarSiempreDiagonalBeta(C,J) &
-    .concat(A,B,L) &
-    .concat(C,L,Final).
-
-
-/*Halla las jugadas comunes*/
-jugadasComunes(Puntuacion,Jugador):-
-		parejasHorizontales(ParejasH,Jugador) &
-		parejasDiagonales(ParejasD,Jugador) &
-		parejaVertical(ParejasV,Jugador) & 
-		parejasTriosGanadorasH(ParejasTrioGananH,Jugador) &
-		parejasTriosGanadorasD(ParejasTrioGananD,Jugador) &
-		
-		trios(Trios3en4,Jugador) &
-		tresEnRayaVertical(TriosVertical,Jugador) &
-		triosGananH(TriosGananH,Jugador) &
-		triosGananD(TriosGananD,Jugador) &
-		
-		busqueda(ParejasH,ParejasD,P1) &
-		busqueda(ParejasH,ParejasV,P2) &
-		busqueda(ParejasH,ParejasTrioGananH,P3) &
-		busqueda(ParejasH,ParejasTrioGananH,P4) &
-		busqueda(ParejasH,Trios3en4,P5) &
-		busqueda(ParejasH,TriosVertical,P6) &
-		busqueda(ParejasH,TriosGananH,P7) &
-		busqueda(ParejasH,TriosGananD,P8) &
-		busqueda(ParejasD,ParejasV,P9) &
-		busqueda(ParejasD,ParejasTrioGananH,P10) &
-		busqueda(ParejasD,ParejasTrioGananD,P11) &
-		busqueda(ParejasD,Trios3en4,P12) &
-		busqueda(ParejasD,TriosVertical,P13) &
-		busqueda(ParejasD,TriosGananH,P14) &
-		busqueda(ParejasD,TriosGananD,P15) &
-		busqueda(ParejasV,ParejasTrioGananH,P16) &
-		busqueda(ParejasV,ParejasTrioGananD,P17) &
-		busqueda(ParejasV,Trios3en4,P18) &
-		busqueda(ParejasV,TriosVertical,P19) &
-		busqueda(ParejasV,TriosGananH,P20) &
-		busqueda(ParejasV,TriosGananD,P21) &
-		busqueda(ParejasTrioGananH,ParejasTrioGananD,P22) &
-		busqueda(ParejasTrioGananH,Trios3en4,P23) &
-		busqueda(ParejasTrioGananH,TriosVertical,P24) &
-		busqueda(ParejasTrioGananH,TriosGananH,P25) &
-		busqueda(ParejasTrioGananH,TriosGananD,P26) &
-		busqueda(ParejasTrioGananD,Trios3en4,P27) &
-		busqueda(ParejasTrioGananD,TriosVertical,P28) &
-		busqueda(ParejasTrioGananD,TriosGananH,P29) &
-		busqueda(ParejasTrioGananD,TriosGananD,P30) &
-		busqueda(Trios3en4,TriosVertical,P31) &
-		busqueda(Trios3en4,TriosGananH,P32) &
-		busqueda(Trios3en4,TriosGananD,P33) &
-		busqueda(TriosVertical,TriosGananH,P34) &
-		busqueda(TriosVertical,TriosGananD,P35) &
-		busqueda(TriosGananH,TriosGananD,P36) &
-		unoMismoComunes(ParejasH,ParejasH,P37) &
-		unoMismoComunes(ParejasD,ParejasD,P38) &
-		unoMismoComunes(ParejasV,ParejasV,P39) &
-		unoMismoComunes(ParejasTrioGananH,ParejasTrioGananH,P40) &
-		unoMismoComunes(ParejasTrioGananD,ParejasTrioGananD,P41) &
-		unoMismoComunes(Trios3en4,Trios3en4,P42) &
-		unoMismoComunes(TriosVertical,TriosVertical,P43) &
-		unoMismoComunes(TriosGananH,TriosGananH,P44) &
-		unoMismoComunes(TriosGananD,TriosGananD,P45) &
-		
-		Puntuacion = 	P1+P2+P3+P4+P5+P6+P7+P8+P9+P10+P11+P12+P13+P14+P15+
-						P16+P17+P18+P19+P20+P21+P22+P23+P24+P25+P26+P27+P28+
-						P29+P30+P31+P32+P33+P34+P35+P36+P37+P38+P39+P40+P41+
-						P42+P43+P44+P45.
-
-
-/*Dadas dos listas de posiciones obtiene los elementos comunes entre ellas*/
-/*
-	Casos base:
-		Lista vac? con una lista cualquiera 
-		Una lista cualquiera con una lista vac?
-	L?ica:
-		Dado un elemento recorre la lista en busca del numero de coincidencias
-		Si dos elementos coinciden entonces aumenta el resultado
-		si ningun elemento coincide avanza en la lista y mantiene el resultado
-*/
-busqueda([],Lista,0).
-busqueda([pos(X,Y)|Tail],Lista,Resultado+Resultado2):-
-	comunes(pos(X,Y),Lista,Resultado) &
-	busqueda(Tail,Lista,Resultado2).
-
-comunes(pos(_,_),[],0).
-comunes(pos(X,Y),[pos(X,Y)|Tail],Resultado):-
-	comunes(pos(X,Y),Tail,Resultado+1).
-comunes(pos(X,Y),[pos(_,_)|Tail],Resultado):-
-	comunes(pos(X,Y),Tail,Resultado). 
-
-unoMismoComunes(_,[],0).
-unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(Y,X)|Tail2],Resultado):-
-	comunes(Tail,Tail2,Resultado+1). 
-unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
-	comunes(Tail,Tail2,Resultado). 
-
-
-/* Initial goals */
-/* Plans */
-
-/*Define elementos iniciales tales como el primer turno*/
-+!definiciones[source(self)]: turno(X) & .my_name(X) <- 
+/*----------------------------------------------------------------------------*/
+/*---------------------------------TURNOS-------------------------------------*/
+/*----------------------------------------------------------------------------*/
+/* Define elementos iniciales tales como el primer turno */
++!definiciones[source(self)]:
+	turno(X) &
+	.my_name(X) <- 
 		+primerTurno("primero");
 		!jugar.
-+!definiciones[source(self)]: turno(X) & not .my_name(X) <- 
++!definiciones[source(self)]:
+	turno(X) &
+	not .my_name(X) <- 
 		+primerTurno("segundo");
 		!jugar.
-+!definiciones[source(self)]<- 
-		.wait(50); 
-		!definiciones.
++!definiciones[source(self)] <- 
+	.wait(50); 
+	!definiciones.
+/*----------------------------------------------------------------------------*/
 
 
-/*Gestiona la partida cuando juega a ganar y empieza primero*/
-+!jugar[source(self)]:
-	turno(X) &
-	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("primero") <-
-		.print("hi").
 
-+!jugar[source(self)]:
-	turno(X) &
-	.my_name(X) &
-	(X = player2) &
-	estrategia(jugarAGanar) &
-	primerTurno("primero") <-
-		.print("hi").
-
-
-/*Gestiona la partida cuando juega a ganar y empieza segundo*/
+/*----------------------------------------------------------------------------*/
+/*---------------------------------JUGAR--------------------------------------*/
+/*----------------------------------------------------------------------------*/
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
-	(X = player1) &
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
+	estrategia(jugarAGanar)[source(percept)] <-
+		.print("hi").
++!jugar[source(self)]:
+	turno(X) &
+	.my_name(X) &
+	estrategia(jugarAGanar) <-
 		.print("hi").
 
-+!jugar[source(self)]:
-	turno(X)[source(percept)] &
-	.my_name(X) &
-	(X = player2) & 
-	estrategia(jugarAGanar)[source(percept)] &
-	primerTurno("segundo")[source(self)] <-
-		.print("hi").
 
 /* Gestiona la partida cuando juega a perder y empieza primero */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
-	(X = player1) & 
 	estrategia(jugarAPerder)[source(percept)] &
 	primerTurno("primero")[source(self)] <-
 		.print("hi").
-
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
-	(X = player2) & 
 	estrategia(jugarAPerder)[source(percept)] &
 	primerTurno("primero")[source(self)] <-
 		.print("hi").
@@ -756,7 +968,6 @@ unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
 	estrategia(jugarAPerder)[source(percept)] &
 	primerTurno("segundo")[source(self)] <-
 		!jugarAperderSegundo.
-
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
 	.my_name(X) &
@@ -768,27 +979,20 @@ unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
 /* Si es el turno del oponente no hace nada */
 +!jugar[source(self)]:
 	turno(X)[source(percept)] &
-	.my_name(Y) &
-	not (X = Y) <- 
+	not .my_name(X) <- 
 		.wait(50);
 		!jugar. 
-
-/*	Busca la primera ficha del rival que no tenga una ficha del jugador colocada
-	encima y coloca su ficha encima de la del rival */		
-+!jugarAperderSegundo[source(self)]:
-	quienSoy(Jugador,Rival) &
-	posicion(X,Y,Rival) &
-	posicion(X,Y-1,0) <-
-		put(X);
-		!jugar.
-	
+/*----------------------------------------------------------------------------*/
 
 
 
-
-	
-
-
-	
-
-	
+/*---------------------------------ERRORES------------------------------------*/
++!encontrarMejorMovimiento <- .print("Error en +!encontrarMejorMovimiento").
++!copiarTablero(_,_) <- .print("Error en +!copiarTablero").
++!borrarTablero(_,_) <- .print("Error en +!borrarTablero").
++!maximizarLista(_,_,_) <- .print("Error en +!maximizarLista").
++!minimizarLista(_,_,_) <- .print("Error en +!minimizarLista").
++!definiciones <- .print("Error en +!definiciones").
++!jugar <- .print("Error en +!jugar").
++!jugarAperderSegundo <- .print("Error en +!jugarAperderSegundo").
+/*----------------------------------------------------------------------------*/
