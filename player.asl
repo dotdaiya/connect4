@@ -11,9 +11,52 @@
 /*----------------------------BELIEFS INICIALES-------------------------------*/
 mejorMovimiento(mov(-1,-1,-100000)). // El mejor movimiento a realizar
 profundidad(3). // La profundidad de búsqueda del árbol minmax
-movimientoMaximizado(-1,-1,-5000).
-movimientoMinimizado(-1,-1,5000).
+movimientoMaximizado(-1,-1,-500).
+movimientoMinimizado(-1,-1,500).
 /*----------------------------------------------------------------------------*/
+
+
+/* Comprueba que nadie haya ganado la partida */
+nadieGano:- //Tested
+	not cuatroEnRayaHorizontal(1) &
+	not cuatroEnRayaVertical(1) &
+	not cuatroEnRayaDiagonalAlpha(1) &
+	not cuatroEnRayaDiagonalBeta(1) &
+	not cuatroEnRayaHorizontal(2) &
+	not cuatroEnRayaVertical(2) &
+	not cuatroEnRayaDiagonalAlpha(2) &
+	not cuatroEnRayaDiagonalBeta(2).
+
+
+/*  Define quien es el jugador y quien es el rival de forma numerica en funcion 
+	del nombre, queda comprobado que el posicion solo reconoce a los agentes con
+	el nombre indicado */
+quienSoy(1,2):-
+	.my_name(player1).
+quienSoy(2,1):-
+	.my_name(player2).
+
+/* Comprueba si se puede colocar en una posición por encima de la fila siete */ 
+puedeColocar(X,Y):- //Tested 
+	posicion(X,Y,0) &
+    (X >= 0 & X < 8) &
+    (Y >= 0 & Y < 8) &
+    (posicion(X,Y+1,1) | posicion(X,Y+1,2)).
+puedeColocar(X,7):- //Tested
+    posicion(X,7,0).
+
+
+/* Comprueba que aún se puede realizar movimientos */
+comprobarCeldasLibres:- //Tested
+	posicion(X,Y,0).
+
+
+/* Comprueba que aún hay celdas libres en una columna */
+comprobarCeldaLibreEnColumna(Columna,Fila):-
+	(Columna >= 0 & Columna < 8) &
+	puedeColocar(Columna,Fila).
+
+
 testing0:- //tresEnRayaDiagonalAlphaDerechaAbajo - tresEnRayaDiagonalAlphaIzquierdaArriba FUNCIONAN
 	.abolish(posicion(_,_,_)) &
 	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
@@ -80,7 +123,7 @@ testing6:- //tresEnCuatroDiagonalAlphaCentroDerecha - tresEnCuatroDiagonalAlphaC
 	.asserta(posicion(0,6,0)) & .asserta(posicion(1,6,1)) & .asserta(posicion(2,6,0)) & .asserta(posicion(3,6,0)) & .asserta(posicion(4,6,0)) & .asserta(posicion(5,6,0)) & .asserta(posicion(6,6,0)) & .asserta(posicion(7,6,0)) &
 	.asserta(posicion(0,7,0)) & .asserta(posicion(1,7,1)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,1)) & .asserta(posicion(5,7,1)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).	
 
-testing7:- //tresEnCuatroDiagonalBetaCentroDerecha - tresEnCuatroDiagonalBetaCentroIzquierdaFUNCIONAN1
+testing7:- //tresEnCuatroDiagonalBetaCentroDerecha - tresEnCuatroDiagonalBetaCentroIzquierdaFUNCIONAN
 	.abolish(posicion(_,_,_)) &
 	.asserta(posicion(0,0,0)) & .asserta(posicion(1,0,0)) & .asserta(posicion(2,0,0)) & .asserta(posicion(3,0,0)) & .asserta(posicion(4,0,0)) & .asserta(posicion(5,0,0)) & .asserta(posicion(6,0,0)) & .asserta(posicion(7,0,0)) &
 	.asserta(posicion(0,1,0)) & .asserta(posicion(1,1,0)) & .asserta(posicion(2,1,0)) & .asserta(posicion(3,1,0)) & .asserta(posicion(4,1,0)) & .asserta(posicion(5,1,0)) & .asserta(posicion(6,1,0)) & .asserta(posicion(7,1,0)) &
@@ -147,83 +190,150 @@ testing12:- //
     .asserta(posicion(0,7,0)) & .asserta(posicion(1,7,0)) & .asserta(posicion(2,7,0)) & .asserta(posicion(3,7,0)) & .asserta(posicion(4,7,0)) & .asserta(posicion(5,7,0)) & .asserta(posicion(6,7,0)) & .asserta(posicion(7,7,0)).
 
 
-
-/* Comprueba que nadie haya ganado la partida */
-nadieGano:- //Tested
-	not cuatroEnRayaHorizontal(1) &
-	not cuatroEnRayaVertical(1) &
-	not cuatroEnRayaDiagonalAlpha(1) &
-	not cuatroEnRayaDiagonalBeta(1) &
-	not cuatroEnRayaHorizontal(2) &
-	not cuatroEnRayaVertical(2) &
-	not cuatroEnRayaDiagonalAlpha(2) &
-	not cuatroEnRayaDiagonalBeta(2).
-
-cuatroEnRaya(Jugador):-
-	cuatroEnRayaHorizontal(Jugador) |
-	cuatroEnRayaVertical(Jugador) |
-	cuatroEnRayaDiagonalAlpha(Jugador) |
-	cuatroEnRayaDiagonalBeta(Jugador).
-
-/*  Define quien es el jugador y quien es el rival de forma numerica en funcion 
-	del nombre, queda comprobado que el posicion solo reconoce a los agentes con
-	el nombre indicado */
-quienSoy(1,2):-
-	.my_name(player1).
-quienSoy(2,1):-
-	.my_name(player2).
-
-/* Comprueba si se puede colocar en una posición por encima de la fila siete */ 
-puedeColocar(X,Y):- //Tested 
-	posicion(X,Y,0) &
-    (X >= 0 & X < 8) &
-    (Y >= 0 & Y < 8) &
-    (posicion(X,Y+1,1) | posicion(X,Y+1,2)).
-puedeColocar(X,7):- //Tested
-    posicion(X,7,0).
-
-
-/* Comprueba que aún se puede realizar movimientos */
-comprobarCeldasLibres:- //Tested
-	posicion(X,Y,0).
-
-
-/* Comprueba que aún hay celdas libres en una columna */
-comprobarCeldaLibreEnColumna(Columna,Fila):-
-	(Columna >= 0 & Columna < 8) &
-	puedeColocar(Columna,Fila).
-
-
-
 /*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
 /* Obtener las puntuaciones del posicion contando el numero de trios, parejas 
 y candidatos ganadores siempre y ponderando su valor */
 
 /* Obtiene la puntuacion total del posicion */
-evaluarTablero(Jugador,jugarAGanar,500):-
+evaluarTablero(Jugador,jugarAGanar,50):-// Cuatro en raya
+	jugador(Jugador) &
+	ganarSiempre(Elem,Jugador) &
 	cuatroEnRaya(Jugador).
-	//.print("1-:Acabo el evaluarTablero con ", 500).
-evaluarTablero(Jugador,jugarAPerder,-500):-
-	oponente(X) &
-	cuatroEnRaya(X).
-	//.print("2---:Acabo el evaluarTablero con ", -500).
-evaluarTablero(Jugador,jugarAGanar,Puntuacion):-
-	puntuacionParejas(P,Jugador) &
-	puntuacionGanarSiempre(Q,Jugador) &
-	puntuacionTrios(R,Jugador) &
-	jugadasComunes(S,Jugador) &
-	(Puntuacion = P+Q+R+S).
-	//.print("3-----:Acabo el evaluarTablero con ", Puntuacion," - Jugador: ",Jugador," - jugarAGanar").
-evaluarTablero(Jugador,jugarAPerder,Puntuacion):-
-	puntuacionGanarSiempre(Q,Jugador) &
-	puntuacionTrios(R,Jugador) &
-	jugadasComunes(S,Jugador) &
-	puntuacionParejas(P,Jugador) &
-	(Puntuacion = -P-Q-R-S).
-	//.print("4--------:Acabo el evaluarTablero con ", Puntuacion).
+evaluarTablero(Jugador,jugarAGanar,-50):-// Cuatro en raya
+	oponente(Jugador) &
+	cuatroEnRaya(Jugador).
+evaluarTablero(Jugador,jugarAPerder,-50):-// Cuatro en raya
+	jugador(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	cuatroEnRaya(Jugador).
+evaluarTablero(Jugador,jugarAPerder,50):-// Cuatro en raya
+	oponente(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	cuatroEnRaya(Jugador).
+
+evaluarTablero(Jugador,jugarAGanar,45):-// Tres en raya ganar siempre
+	jugador(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	.length(Elem,X) &
+	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAGanar,-45):-// Tres en raya ganar siempre
+	oponente(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	.length(Elem,X) &
+	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAPerder,-45):-// Tres en raya ganar siempre
+	jugador(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	.length(Elem,X) &
+	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAPerder,45):-// Tres en raya ganar siempre
+	oponente(Jugador) &
+	ganarSiempre(Elem,Jugador) &
+	.length(Elem,X) &
+	.print("tresEnRayaGanarSiempre-Length: ", X) &
+	X >= 1 .
+
+evaluarTablero(Jugador,jugarAGanar,45):-// >1 trio
+	jugador(Jugador) &
+	trios(Elem,J) &
+	.length(Elem,X) &
+	.print(">1trio-Length: ", X) & 
+	X > 1.
+evaluarTablero(Jugador,jugarAGanar,-45):-// >1 trio
+	oponente(Jugador) &
+	trios(Elem,J) &
+	.length(Elem,X) &
+	.print(">1trio-Length: ", X) & 
+	X > 1.
+evaluarTablero(Jugador,jugarAPerder,-45):-// >1 trio
+	jugador(Jugador) &
+	trios(Elem,J) &
+	.length(Elem,X) &
+	.print(">1trio-Length: ", X) & 
+	X > 1.
+evaluarTablero(Jugador,jugarAPerder,45):-// >1 trio
+	oponente(Jugador) &
+	trios(Elem,J) &
+	.length(Elem,X) &
+	.print(">1trio-Length: ", X) & 
+	X > 1.
+
+evaluarTablero(Jugador,jugarAGanar,35+X):-// Un solo trio
+	jugador(Jugador) &
+	trios(Elem,J) &
+	.print("1trio") & 
+	.length(Elem,1).
+evaluarTablero(Jugador,jugarAGanar,-35-X):-// Un solo trio
+	oponente(Jugador) &
+	trios(Elem,J) &
+	.print("1trio") & 
+	.length(Elem,1).
+evaluarTablero(Jugador,jugarAPerder,-35-X):-// Un solo trio
+	jugador(Jugador) &
+	trios(Elem,J) &
+	.print("1trio") & 
+	.length(Elem,1).
+evaluarTablero(Jugador,jugarAPerder,35+X):-// Un solo trio
+	oponente(Jugador) &
+	trios(Elem,J) &
+	.print("1trio") & 
+	.length(Elem,1).
+
+evaluarTablero(Jugador,jugarAGanar,30+X):-// Una pareja ganadora
+	jugador(Jugador) &
+	parejaGanadora(Elem,J) &
+	.length(Elem,X) &
+	.print("parejaGanadora-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAGanar,-30-X):-// Una pareja ganadora
+	oponente(Jugador) &
+	parejaGanadora(Elem,J) &
+	.length(Elem,X) &
+	.print("parejaGanadora-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAPerder,-30-X):-// Una pareja ganadora
+	jugador(Jugador) &
+	parejaGanadora(Elem,J) &
+	.length(Elem,X) &
+	.print("parejaGanadora-Length: ", X) &
+	X >= 1 .
+evaluarTablero(Jugador,jugarAPerder,30+X):-// Una pareja ganadora
+	oponente(Jugador) &
+	parejaGanadora(Elem,J) &
+	.length(Elem,X) &
+	.print("parejaGanadora-Length: ", X) &
+	X >= 1 .
+
+evaluarTablero(Jugador,jugarAGanar,10+X):-// Jugadas comunes con parejas
+	jugador(Jugador) &
+	jugadasComunes(Elem,J) &
+	.length(Elem,X) &
+	.print("jugadasComunes-Length: ", X) &
+	X >= 1.
+evaluarTablero(Jugador,jugarAGanar,-10-X):-// Jugadas comunes con parejas
+	oponente(Jugador) &
+	jugadasComunes(Elem,J) &
+	.length(Elem,X) &
+	.print("jugadasComunes-Length: ", X) &
+	X >= 1.
+evaluarTablero(Jugador,jugarAPerder,-10-X):-// Jugadas comunes con parejas
+	jugador(Jugador) &
+	jugadasComunes(Elem,J) &
+	.length(Elem,X) &
+	.print("jugadasComunes-Length: ", X) &
+	X >= 1.
+evaluarTablero(Jugador,jugarAPerder,10+X):-// Jugadas comunes con parejas
+	oponente(Jugador) &
+	jugadasComunes(Elem,J) &
+	.length(Elem,X) &
+	.print("jugadasComunes-Length: ", X) &
+	X >= 1.
 
 
-/*Obtiene la puntuacion de las parejas encontradas
+	/*Obtiene la puntuacion de las parejas encontradas
 
 	Horizontales:15 
 	Diagonales:20
@@ -231,25 +341,13 @@ evaluarTablero(Jugador,jugarAPerder,Puntuacion):-
 	Generan trios Horizontales:60
 	Generan trios Diagonales:65
 	*/		
-puntuacionParejas(Total,Jugador):-
-	parejasHorizontales(Lista1,Jugador) &
-	parejasTriosGanadorasH(Lista2,Jugador) &
-	parejasTriosGanadorasD(Lista3,Jugador) &
-	parejasDiagonales(Lista4,Jugador) &
-	parejaVertical(Lista5,Jugador) & 
-	.length(Lista1,Puntuacion) &
-	.length(Lista2,Puntuacion2) &
-	.length(Lista3,Puntuacion3) &
-	.length(Lista4,Puntuacion4) &
-	.length(Lista5,Puntuacion5) &
-	Total = Puntuacion*15 + Puntuacion2*60 + Puntuacion3*65 + Puntuacion4*20 + Puntuacion5*10.
 
-
-/*Obtiene la puntuacion de los candidatos a ganar siempre 90/100 */
-puntuacionGanarSiempre(Total,Jugador):-
-	ganarSiempre(L,Jugador) &
-	.length(L,Puntuacion) &
-	Total = Puntuacion*90.
+/* Busca cuatro en raya */
+cuatroEnRaya(Jugador):-
+	cuatroEnRayaHorizontal(Jugador) |
+	cuatroEnRayaVertical(Jugador) |
+	cuatroEnRayaDiagonalAlpha(Jugador) |
+	cuatroEnRayaDiagonalBeta(Jugador).
 
 
 /* Halla los trios que ganan siempre */
@@ -261,59 +359,57 @@ ganarSiempre(Final,J):-
     .concat(C,L,Final).
 
 
-/* Halla las parejas que generan un trio que ganan siempre */
-parejasTriosGanadorasH(L,J):-
-	parejaGanadoraHorizontalDerecha(A,J) &
-	parejaGanadoraHorizontalIzquierda(B,J) &
-	parejaGanadoraHorizontalCentral(C,J) &
-	.concat(A,B,L) &
-	.concat(C,L,L2).
-parejasTriosGanadorasD(Final,J):-
-	parejaGanadoraDiagonalAlphaDerecha(A,J)&
-	parejaGanadoraDiagonalAlphaIzquierda(B,J) &
-	parejaGanadoraDiagonalAlphaCentral(C,J) &
-	parejaGanadoraDiagonalBetaIzquierda(D,J) &
-	parejaGanadoraDiagonalBetaDerecha(E,J) &
-	parejaGanadoraDiagonalBetaCentral(F,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(L,L2,L4) &
-	.concat(L4,L3,Final).
-
-
-/* 	Halla los trios en el posicion donde hay tres en cuatro y falta
-	una para ganar */
+/* Un trio */
 trios(Final,J):-
-    tresEnCuatroHorizontalCentroDerecha(A,J) &
-    tresEnCuatroHorizontalCentroIzquierda(B,J) &
-    tresEnCuatroDiagonalAlphaCentroDerecha(C,J) &
-    tresEnCuatroDiagonalAlphaCentroIzquierda(D,J) &
-    tresEnCuatroDiagonalBetaCentroDerecha(E,J) &
-    tresEnCuatroDiagonalBetaCentroIzquierda(F,J) & 
-    .concat(A,B,L) &
-    .concat(C,D,L2) &
-    .concat(E,F,L3) &
-    .concat(L,L2,L4) &
-    .concat(L4,L3,Final).
+	tresEnRayaVertical(A0,J) &
+	tresEnRayaHorizontalIzquierda(A1,J) &
+	tresEnRayaHorizontalDerecha(A2,J) &
+	tresEnRayaDiagonalAlphaDerechaAbajo(A3,J) &
+	tresEnRayaDiagonalAlphaIzquierdaArriba(A4,J) &
+	tresEnRayaDiagonalBetaDerechaArriba(A5,J) &
+	tresEnRayaDiagonalBetaIzquierdaAbajo(A6,J) &
+	tresEnCuatroHorizontalCentroDerecha(A7,J) &
+	tresEnCuatroHorizontalCentroIzquierda(A8,J) &
+	tresEnCuatroDiagonalAlphaCentroDerecha(A9,J) &
+	tresEnCuatroDiagonalAlphaCentroIzquierda(A10,J) &
+	tresEnCuatroDiagonalBetaCentroDerecha(A11,J) &
+	tresEnCuatroDiagonalBetaCentroIzquierda(A12,J) &
+	.union(A0,A1,B0) &
+	.union(A2,A3,B1) &
+	.union(A4,A5,B2) &
+	.union(A6,A7,B3) &
+	.union(A8,A9,B4) &
+	.union(A10,A11,B5) &
+	.union(B0,B1,C0) &
+	.union(B2,B3,C1) &
+	.union(B4,B5,C2) &
+	.union(C0,C1,D0) &
+	.union(C2,D0,E0) &
+	.union(C0,A12,Final).
 
 
-/* Posiciones en las que tienes un tres en raya con solo una libre */
-triosGananD(Final,J):-
-    tresEnRayaDiagonalAlphaDerechaAbajo(A,J) &
-    tresEnRayaDiagonalAlphaIzquierdaArriba(B,J) &
-    tresEnRayaDiagonalBetaDerechaArriba(C,J) &
-    tresEnRayaDiagonalBetaIzquierdaAbajo(D,J) & 
-    .concat(A,B,L) &
-    .concat(C,D,L2) &
-    .concat(L,L2,Final).
-triosGananH(Final,J):-
-    tresEnRayaHorizontalIzquierda(A,J) &
-    tresEnRayaHorizontalDerecha(B,J) &
-    .concat(A,B,Final).
+/* Una pareja que desemboque en una ganadora */
+parejaGanadora(Final,J):-
+	parejaGanadoraHorizontalDerecha(A0,J) &
+	parejaGanadoraHorizontalIzquierda(A1,J) &
+	parejaGanadoraHorizontalCentral(A2,J) &
+	parejaGanadoraDiagonalAlphaDerecha(A3,J) &
+	parejaGanadoraDiagonalAlphaIzquierda(A4,J) &
+	parejaGanadoraDiagonalAlphaCentral(A5,J) &
+	parejaGanadoraDiagonalBetaIzquierda(A6,J) &
+	parejaGanadoraDiagonalBetaDerecha(A7,J) &
+	parejaGanadoraDiagonalBetaCentral(A8,J) &
+	.union(A0,A1,B0) &
+	.union(A2,A3,B1) &
+	.union(A4,A5,B2) &
+	.union(A6,A7,B3) &
+	.union(B0,B1,C0) &
+	.union(B2,B3,C1) &
+	.union(C0,C1,D0) &
+	.union(D0,A8,Final).
 
 
-/* Halla las parejas disponibles en el posicion */
+/* Halla todas las parejas */
 parejasHorizontales(Final,J):-
 	parejaHorizontalIzquierda(A,J) &
 	parejaHorizontalDerecha(B,J) &
@@ -321,11 +417,11 @@ parejasHorizontales(Final,J):-
 	parejaHorizontalSeparadaIzquierda(D,J) &
 	parejaHorizontalSeparadaIzquierda(E,J) &
 	parejaHorizontalSeparadaCentro(F,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(L,L2,L4) &
-	.concat(L4,L3,Final).
+	.union(A,B,L) &
+	.union(C,D,L2) &
+	.union(E,F,L3) &
+	.union(L,L2,L4) &
+	.union(L4,L3,Final).
 parejasDiagonales(Final,J):-
 	parejaDiagonalAlphaIzquierda(A,J) &
 	parejaDiagonalAlphaDerecha(B,J) &
@@ -339,67 +435,33 @@ parejasDiagonales(Final,J):-
 	parejaGeDiagonalBetaSeparadaIzq(K,J) &
 	parejaGeneraTrioDiagonalSeparadaDer(L,J) &
 	parejaDiagonalBetaSeparadaCentro(M,J) &
-	.concat(A,B,L) &
-	.concat(C,D,L2) &
-	.concat(E,F,L3) &
-	.concat(G,H,L4) &
-	.concat(I,K,L5) &
-	.concat(L,M,L6) &
-	.concat(L,L2,L7) &
-	.concat(L3,L4,L8) &
-	.concat(L5,L6,L9) &
-	.concat(L7,L8,L10) &
-	.concat(L9,L10,Final).
+	.union(A,B,L) &
+	.union(C,D,L2) &
+	.union(E,F,L3) &
+	.union(G,H,L4) &
+	.union(I,K,L5) &
+	.union(L,M,L6) &
+	.union(L,L2,L7) &
+	.union(L3,L4,L8) &
+	.union(L5,L6,L9) &
+	.union(L7,L8,L10) &
+	.union(L9,L10,Final).
 
 
-/*
-	Obtiene la puntuacion de los trios encontrados
-			trio que les falta una para ganar 85
-			trios que ganan en Diagonal 75
-			trios que ganan en Horizontal 70
-			trios verticales 60
-*/
-puntuacionTrios(Total,Jugador):-
-	trios(Lista1,Jugador) &
-	triosGananH(Lista2,Jugador) &
-	triosGananD(Lista3,Jugador) &
-	tresEnRayaVertical(Lista4,Jugador) &
-	.length(Lista1,Puntuacion)&
-	.length(Lista2,Puntuacion2)&
-	.length(Lista3,Puntuacion3)&
-	.length(Lista4,Puntuacion4)&
-	Total = Puntuacion*85 + Puntuacion3*75 + Puntuacion2*70 + Puntuacion4*60.
+/* Halla las jugadas comunes */
+jugadasComunes(I2,J):-
+		parejasHorizontales(ParejasH,J) &
+		parejasDiagonales(ParejasD,J) &
+		parejaVertical(ParejasV,J) & 
+		.union(ParejasH,ParejasD,A0) &
+		.union(A0,ParejasV,A1) &
+		.union(A1,ParejasGanadora,A2).
+
 /*----------------------------------------------------------------------------*/
 
 
 
-
-
-/*SE SUBSTITUIRAN POR .INTERSECTION*/
-busqueda([],Lista,0).
-busqueda([pos(X,Y)|Tail],Lista,Resultado+Resultado2):-
-	comunes(pos(X,Y),Lista,Resultado) &
-	busqueda(Tail,Lista,Resultado2).
-comunes(pos(_,_),[],0).
-comunes(pos(X,Y),[pos(X,Y)|Tail],Resultado):-
-	comunes(pos(X,Y),Tail,Resultado+1).
-comunes(pos(X,Y),[pos(_,_)|Tail],Resultado):-
-	comunes(pos(X,Y),Tail,Resultado). 
-/***********************************/
-
-unoMismoComunes(_,[],0).
-unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(Y,X)|Tail2],Resultado):-
-	comunes(Tail,Tail2,Resultado+1). 
-unoMismoComunes([pos(X,Y)|Tail],[pos(_,_),pos(A,B)|Tail2],Resultado):-
-	comunes(Tail,Tail2,Resultado). 
-
-
-
-
-
-
-
-
+/*-------------------------------MIN MAX--------------------------------------*/
 
 /*Minimizar la puntuación de una lista de movimientos */
 minimizarLista(X,[],X).
@@ -421,25 +483,37 @@ maximizarLista(Puntos0,[Puntos1|Tail],Puntos):-
 	maximizarLista(Puntos0,Tail,Puntos).
 
 
-/* Si gana devuelve 500 */
-minMax(Jugador,Profundidad,500,Maximizar):-
+/* Si gana devuelve 50 jugar a ganar*/
+minMax(Jugador,Profundidad,50,Maximizar):-
 	//.print("GANAR") &
-	estrategia(Estrategia)[source(percept)] &
+	estrategia(jugarAGanar)[source(percept)] &
 	cuatroEnRaya(Jugador).
 	//.print("FIN GANAR").
-/* Si pierde devuelve -500 */
-minMax(Jugador,Profundidad,-500,Maximizar):-
+/* Si pierde devuelve -50 jugar a ganar*/
+minMax(Jugador,Profundidad,-50,Maximizar):-
 	//.print("GANAR") &
-	estrategia(Estrategia)[source(percept)] &
+	estrategia(jugarAGanar)[source(percept)] &
 	oponente(O) &
 	cuatroEnRaya(O).
 	//.print("FIN GANAR").
-/* En caso de empate */
+/* Si gana devuelve -50 jugar a perder*/
+minMax(Jugador,Profundidad,-50,Maximizar):-
+	//.print("GANAR") &
+	estrategia(jugarAPerder)[source(percept)] &
+	cuatroEnRaya(Jugador).
+	//.print("FIN GANAR").
+/* Si pierde devuelve 50 jugar a perder*/
+minMax(Jugador,Profundidad,50,Maximizar):-
+	//.print("GANAR") &
+	estrategia(jugarAPerder)[source(percept)] &
+	oponente(O) &
+	cuatroEnRaya(O).
+	//.print("FIN GANAR").
+/* En caso de empate*/
 minMax(Jugador,Profundidad,0,Maximizar):-
 	//.print("EMPATE minMax") &
 	not comprobarCeldasLibres &
-	estrategia(Estrategia)[source(percept)] &
-	evaluarTablero(Jugador,Estrategia,0).
+	nadieGano.
 	//.print("FIN EMPATE minMax").
 /* Caso base */
 minMax(Jugador,0,Puntos,Maximizar):-
@@ -455,7 +529,7 @@ minMax(Jugador,Profundidad,Puntos,Maximizar):-
 	oponente(Jugador2) &
 	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","not true",")") &
 	iterar(0,Jugador2,Profundidad-1,not true,LMovimientos) &
-	maximizarLista(-5000,LMovimientos,Puntos).
+	maximizarLista(-500,LMovimientos,Puntos).
 	//.print("FIN MAXIMIZAR minMax").
 /* Turno de minimizar */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
@@ -465,7 +539,7 @@ minMax(Jugador,Profundidad,Puntos,Maximizar):-
 	jugador(Jugador2) &
 	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","true",")") &
 	iterar(0,Jugador2,Profundidad-1,true,LMovimientos) &
-	minimizarLista(5000,LMovimientos,Puntos).
+	minimizarLista(500,LMovimientos,Puntos).
 	//.print("FIN MINIMIZAR minMax").
 
 
@@ -490,75 +564,11 @@ iterar(Columna,Jugador,Profundidad,Maximizar,[Puntos|LMovimientos]):-
 	.abolish(posicion(Columna,Fila,Jugador)) &
 	.asserta(posicion(Columna,Fila,W)) &
 	iterar(Columna+1,Jugador,Profundidad,Maximizar,LMovimientos).
-
-
-/* Halla las jugadas comunes */
-jugadasComunes(Puntuacion,Jugador):-
-		parejasHorizontales(ParejasH,Jugador) &
-		parejasDiagonales(ParejasD,Jugador) &
-		parejaVertical(ParejasV,Jugador) & 
-		parejasTriosGanadorasH(ParejasTrioGananH,Jugador) &
-		parejasTriosGanadorasD(ParejasTrioGananD,Jugador) &
-		
-		trios(Trios3en4,Jugador) &
-		tresEnRayaVertical(TriosVertical,Jugador) &
-		triosGananH(TriosGananH,Jugador) &
-		triosGananD(TriosGananD,Jugador) &
-		
-		busqueda(ParejasH,ParejasD,P1) &
-		busqueda(ParejasH,ParejasV,P2) &
-		busqueda(ParejasH,ParejasTrioGananH,P3) &
-		busqueda(ParejasH,ParejasTrioGananH,P4) &
-		busqueda(ParejasH,Trios3en4,P5) &
-		busqueda(ParejasH,TriosVertical,P6) &
-		busqueda(ParejasH,TriosGananH,P7) &
-		busqueda(ParejasH,TriosGananD,P8) &
-		busqueda(ParejasD,ParejasV,P9) &
-		busqueda(ParejasD,ParejasTrioGananH,P10) &
-		busqueda(ParejasD,ParejasTrioGananD,P11) &
-		busqueda(ParejasD,Trios3en4,P12) &
-		busqueda(ParejasD,TriosVertical,P13) &
-		busqueda(ParejasD,TriosGananH,P14) &
-		busqueda(ParejasD,TriosGananD,P15) &
-		busqueda(ParejasV,ParejasTrioGananH,P16) &
-		busqueda(ParejasV,ParejasTrioGananD,P17) &
-		busqueda(ParejasV,Trios3en4,P18) &
-		busqueda(ParejasV,TriosVertical,P19) &
-		busqueda(ParejasV,TriosGananH,P20) &
-		busqueda(ParejasV,TriosGananD,P21) &
-		busqueda(ParejasTrioGananH,ParejasTrioGananD,P22) &
-		busqueda(ParejasTrioGananH,Trios3en4,P23) &
-		busqueda(ParejasTrioGananH,TriosVertical,P24) &
-		busqueda(ParejasTrioGananH,TriosGananH,P25) &
-		busqueda(ParejasTrioGananH,TriosGananD,P26) &
-		busqueda(ParejasTrioGananD,Trios3en4,P27) &
-		busqueda(ParejasTrioGananD,TriosVertical,P28) &
-		busqueda(ParejasTrioGananD,TriosGananH,P29) &
-		busqueda(ParejasTrioGananD,TriosGananD,P30) &
-		busqueda(Trios3en4,TriosVertical,P31) &
-		busqueda(Trios3en4,TriosGananH,P32) &
-		busqueda(Trios3en4,TriosGananD,P33) &
-		busqueda(TriosVertical,TriosGananH,P34) &
-		busqueda(TriosVertical,TriosGananD,P35) &
-		busqueda(TriosGananH,TriosGananD,P36) &
-		unoMismoComunes(ParejasH,ParejasH,P37) &
-		unoMismoComunes(ParejasD,ParejasD,P38) &
-		unoMismoComunes(ParejasV,ParejasV,P39) &
-		unoMismoComunes(ParejasTrioGananH,ParejasTrioGananH,P40) &
-		unoMismoComunes(ParejasTrioGananD,ParejasTrioGananD,P41) &
-		unoMismoComunes(Trios3en4,Trios3en4,P42) &
-		unoMismoComunes(TriosVertical,TriosVertical,P43) &
-		unoMismoComunes(TriosGananH,TriosGananH,P44) &
-		unoMismoComunes(TriosGananD,TriosGananD,P45) &
-		
-		Puntuacion = 	P1+P2+P3+P4+P5+P6+P7+P8+P9+P10+P11+P12+P13+P14+P15+
-						P16+P17+P18+P19+P20+P21+P22+P23+P24+P25+P26+P27+P28+
-						P29+P30+P31+P32+P33+P34+P35+P36+P37+P38+P39+P40+P41+
-						P42+P43+P44+P45.
+/*----------------------------------------------------------------------------*/
 
 
 
-/*-----------------------PARA EVALUAR EL TABLERO------------------------------*/
+/*------------------------PATRONES DEL TABLERO--------------------------------*/
 /* Comprueba si hay un cuatro en raya en el posicion */
 cuatroEnRayaVertical(J):-
 	posicion(X,Y,J) &
@@ -1100,6 +1110,46 @@ solitaGeneraUna([],J).
 	movimientoMaximizado(X,Y,Puntos) <-
 		put(X).
 /*----------------------------------------------------------------------------*/
+
+
+
+/*----------------------------------------------------------------------------*/
+/*-----------------------ENCONTRAR PEOR MOVIMIENTO---------------------------*/
+/*----------------------------------------------------------------------------*/
+
+// Si no hay celdas libres
++!encontrarPeorMovimiento(Columna)[source(self)]:
+	not comprobarCeldasLibres[source(self)] <-
+		!jugar.
+// Si no se puede colocar en la columna
++!encontrarPeorMovimiento(Columna)[source(self)]: 
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	not comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] <-
+		!encontrarPeorMovimiento(Columna+1).
+// Si se puede colocar ficha en la columna
++!encontrarPeorMovimiento(Columna)[source(self)]:
+	(Columna < 8 & Columna >= 0) &
+	comprobarCeldasLibres[source(self)] &
+	comprobarCeldaLibreEnColumna(Columna,Fila)[source(self)] &
+	jugador(Jugador)[source(self)] <-
+		?posicion(Columna,Fila,0);
+		-posicion(Columna,Fila,0);
+		+posicion(Columna,Fila,Jugador);
+		.print("Columna: ",Columna," - Fila: ",Fila," - Ocupado por: ",Jugador);
+		?minMax(Jugador,2,Puntos,not true);
+		.print("Acabo el minMax para columna: ",Columna," con ", Puntos);
+		!minimizar(Columna,Fila,Puntos);
+		-posicion(Columna,Fila,Jugador);
+		+posicion(Columna,Fila,0);
+		!encontrarPeorMovimiento(Columna+1).
+// Si ya has comprobado todas las columnas
++!encontrarPeorMovimiento(Columna)[source(self)]: 
+	Columna >= 8 &
+	movimientoMinimizado(X,Y,Puntos) <-
+		put(X).
+/*----------------------------------------------------------------------------*/
+
 
 
 
