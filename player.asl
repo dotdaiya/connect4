@@ -160,9 +160,9 @@ nadieGano:- //Tested
 	not cuatroEnRayaDiagonalBeta(2).
 
 cuatroEnRaya(Jugador):-
-	cuatroEnRayaHorizontal(Jugador) &
-	cuatroEnRayaVertical(Jugador) &
-	cuatroEnRayaDiagonalAlpha(Jugador) &
+	cuatroEnRayaHorizontal(Jugador) |
+	cuatroEnRayaVertical(Jugador) |
+	cuatroEnRayaDiagonalAlpha(Jugador) |
 	cuatroEnRayaDiagonalBeta(Jugador).
 
 /*  Define quien es el jugador y quien es el rival de forma numerica en funcion 
@@ -202,21 +202,25 @@ y candidatos ganadores siempre y ponderando su valor */
 /* Obtiene la puntuacion total del posicion */
 evaluarTablero(Jugador,jugarAGanar,500):-
 	cuatroEnRaya(Jugador).
+	//.print("1-:Acabo el evaluarTablero con ", 500).
 evaluarTablero(Jugador,jugarAPerder,-500):-
 	oponente(X) &
 	cuatroEnRaya(X).
+	//.print("2---:Acabo el evaluarTablero con ", -500).
 evaluarTablero(Jugador,jugarAGanar,Puntuacion):-
 	puntuacionParejas(P,Jugador) &
 	puntuacionGanarSiempre(Q,Jugador) &
 	puntuacionTrios(R,Jugador) &
 	jugadasComunes(S,Jugador) &
 	(Puntuacion = P+Q+R+S).
+	//.print("3-----:Acabo el evaluarTablero con ", Puntuacion," - Jugador: ",Jugador," - jugarAGanar").
 evaluarTablero(Jugador,jugarAPerder,Puntuacion):-
 	puntuacionGanarSiempre(Q,Jugador) &
 	puntuacionTrios(R,Jugador) &
 	jugadasComunes(S,Jugador) &
 	puntuacionParejas(P,Jugador) &
 	(Puntuacion = -P-Q-R-S).
+	//.print("4--------:Acabo el evaluarTablero con ", Puntuacion).
 
 
 /*Obtiene la puntuacion de las parejas encontradas
@@ -417,41 +421,52 @@ maximizarLista(Puntos0,[Puntos1|Tail],Puntos):-
 	maximizarLista(Puntos0,Tail,Puntos).
 
 
-/* Si gana o pierde devuelve ese movimiento */
-minMax(Jugador,Profundidad,Puntos,Maximizar):-
-	.print("GANAR O PERDER") &
-	evaluarTablero(Jugador,Estrategia,Puntos) &
-	(Puntos = 500 | Puntos = -500) &
-	.print("FIN GANAR O PERDER").
+/* Si gana devuelve 500 */
+minMax(Jugador,Profundidad,500,Maximizar):-
+	//.print("GANAR") &
+	estrategia(Estrategia)[source(percept)] &
+	cuatroEnRaya(Jugador).
+	//.print("FIN GANAR").
+/* Si pierde devuelve -500 */
+minMax(Jugador,Profundidad,-500,Maximizar):-
+	//.print("GANAR") &
+	estrategia(Estrategia)[source(percept)] &
+	oponente(O) &
+	cuatroEnRaya(O).
+	//.print("FIN GANAR").
 /* En caso de empate */
 minMax(Jugador,Profundidad,0,Maximizar):-
-	.print("EMPATE minMax") &
+	//.print("EMPATE minMax") &
 	not comprobarCeldasLibres &
-	evaluarTablero(Jugador,Estrategia,0) &
-	.print("FIN EMPATE minMax").
+	estrategia(Estrategia)[source(percept)] &
+	evaluarTablero(Jugador,Estrategia,0).
+	//.print("FIN EMPATE minMax").
 /* Caso base */
 minMax(Jugador,0,Puntos,Maximizar):-
+	//.print("Caso base") &
+	estrategia(Estrategia)[source(percept)] &
 	evaluarTablero(Jugador,Estrategia,Puntos).
+	//.print("FIN Caso base").
 /* Turno de maximizar */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
 	Profundidad > 0 &
-	.print("MAXIMIZAR minMax") &
+	//.print("MAXIMIZAR minMax") &
 	Maximizar &
 	oponente(Jugador2) &
-	.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","not true",")") &
+	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","not true",")") &
 	iterar(0,Jugador2,Profundidad-1,not true,LMovimientos) &
-	maximizarLista(-5000,LMovimientos,Puntos) &
-	.print("FIN MAXIMIZAR minMax").
+	maximizarLista(-5000,LMovimientos,Puntos).
+	//.print("FIN MAXIMIZAR minMax").
 /* Turno de minimizar */
 minMax(Jugador,Profundidad,Puntos,Maximizar):-
 	Profundidad > 0 &
-	.print("MINIMIZAR minMax") &
+	//.print("MINIMIZAR minMax") &
 	not Maximizar &
 	jugador(Jugador2) &
-	.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","true",")") &
+	//.print("DATOS:(","0 - ",Jugador2," - ",Profundidad-1," - ","true",")") &
 	iterar(0,Jugador2,Profundidad-1,true,LMovimientos) &
-	minimizarLista(5000,LMovimientos,Puntos) &
-	.print("FIN MINIMIZAR minMax").
+	minimizarLista(5000,LMovimientos,Puntos).
+	//.print("FIN MINIMIZAR minMax").
 
 
 /* Ya se recorrieron todas las posibilidades de movimientos */
@@ -1072,7 +1087,9 @@ solitaGeneraUna([],J).
 		?posicion(Columna,Fila,0);
 		-posicion(Columna,Fila,0);
 		+posicion(Columna,Fila,Jugador);
-		?minMax(Jugador,0,Puntos,true);
+		.print("Columna: ",Columna,"-Fila: ",Fila,"- Ocupado por: ",Jugador);
+		?minMax(Jugador,2,Puntos,true);
+		.print("Acabo el minMax para columna: ",Columna," con ", Puntos);
 		!maximizar(Columna,Fila,Puntos);
 		-posicion(Columna,Fila,Jugador);
 		+posicion(Columna,Fila,0);
@@ -1092,15 +1109,15 @@ solitaGeneraUna([],J).
 +!maximizar(X,Y,Puntos)[source(self)]:
 	movimientoMaximizado(X1,Y1,Puntos1) &
 	Puntos > Puntos1 <-
-		-movimientoMaximizado(X1,Y1,Puntos);
-		+movimientoMaximizado(X,Y,Puntos1).
+		-movimientoMaximizado(X1,Y1,Puntos1);
+		+movimientoMaximizado(X,Y,Puntos).
 +!maximizar(X,Y,Puntos)[source(self)].
 
 +!minimizar(X,Y,Puntos)[source(self)]:
 	movimientoMinizado(X1,Y1,Puntos1) &
 	Puntos < Puntos1 <-
-		-movimientoMinizado(X1,Y1,Puntos);
-		+movimientoMinizado(X,Y,Puntos1).
+		-movimientoMinizado(X1,Y1,Puntos1);
+		+movimientoMinizado(X,Y,Puntos).
 +!minimizar(Puntos)[source(self)].
 /*----------------------------------------------------------------------------*/
 
@@ -1116,6 +1133,8 @@ solitaGeneraUna([],J).
 		+primerTurno("primero");
 		+jugador(X1);
 		+oponente(Y1);
+		!borrarTablero;
+		!copiarTablero(0,0);
 		!jugar.
 +!definiciones[source(self)]:
 	turno(X)[source(percept)] &
@@ -1124,6 +1143,8 @@ solitaGeneraUna([],J).
 		+primerTurno("segundo");
 		+jugador(X1);
 		+oponente(Y1);
+		!borrarTablero;
+		!copiarTablero(0,0);
 		!jugar.
 +!definiciones[source(self)] <- 
 	.wait(50); 
